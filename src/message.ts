@@ -246,6 +246,76 @@ export class MessageSystem {
       this.show(instruction.content, MessageType.INSTRUCTION);
     }
   }
+  // Property to store original styles
+  private _originalStyles: {
+    position: string;
+    top: string;
+    left: string;
+    maxWidth: string;
+  } | null = null;
+
+  public showLoading(): void {
+    // Save original styles to restore later
+    const originalPosition = this.messageElement.style.position;
+    const originalTop = this.messageElement.style.top;
+    const originalLeft = this.messageElement.style.left;
+    const originalMaxWidth = this.messageElement.style.maxWidth;
+
+    // Center the message on screen
+    this.messageElement.style.position = "absolute";
+    this.messageElement.style.top = "50%";
+    this.messageElement.style.left = "50%";
+    this.messageElement.style.transform = "translate(-50%, -50%)";
+    this.messageElement.style.maxWidth = "300px";
+
+    const loadingMessage = `
+    <div style="text-align: center;">
+      <h3>Loading...</h3>
+      <div class="loading-spinner" style="
+        display: inline-block;
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+      "></div>
+      <p style="margin-top: 15px;">Initializing game...</p>
+    </div>
+    <style>
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  `;
+
+    this.messageElement.innerHTML = loadingMessage;
+    this.messageElement.style.display = "block";
+    this.instructionsButton.style.display = "none";
+    this.currentlyShowingMessage = true;
+
+    // Store original positions for restoring later
+    this._originalStyles = {
+      position: originalPosition,
+      top: originalTop,
+      left: originalLeft,
+      maxWidth: originalMaxWidth,
+    };
+  }
+
+  public hideLoading(): void {
+    // Restore original position styles before hiding
+    if (this._originalStyles) {
+      this.messageElement.style.position = this._originalStyles.position;
+      this.messageElement.style.top = this._originalStyles.top;
+      this.messageElement.style.left = this._originalStyles.left;
+      this.messageElement.style.maxWidth = this._originalStyles.maxWidth;
+      this.messageElement.style.transform = ""; // Remove transform
+      this._originalStyles = null;
+    }
+
+    this.hide();
+  }
 
   // Add a new instruction
   public addInstruction(title: string, content: string): void {

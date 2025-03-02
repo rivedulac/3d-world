@@ -18,6 +18,7 @@ function init(): void {
 
   console.log("Starting game initialization...");
 
+  // First set up the scene and display it - no loading screen yet
   const {
     scene: newScene,
     camera: newCamera,
@@ -28,43 +29,60 @@ function init(): void {
   gameInstance.camera = newCamera;
   gameInstance.renderer = newRenderer;
 
-  console.log("Setting up environment objects...");
-  addEnvironmentObjects(newScene);
+  // Render once to show the background
+  newRenderer.render(newScene, newCamera);
 
-  console.log("Setting character...");
-  gameInstance.character = new Character(newScene);
+  // Now show the loading screen - after the background is visible
+  MessageSystem.getInstance().showLoading();
 
-  // Setup key controls
-  console.log("Setting up key controls...");
-  gameInstance.character.setupControls();
+  // Use requestAnimationFrame to continue initialization on the next frame
+  // This ensures the loading screen is rendered
+  requestAnimationFrame(() => {
+    console.log("Setting up environment objects...");
+    addEnvironmentObjects(newScene);
 
-  // Adjust for window resize
-  console.log("Setting up window resize...");
-  setWindowResize(newCamera, newRenderer);
+    // Render another frame to show environment objects being added
+    newRenderer.render(newScene, newCamera);
 
-  // Start animation loop
-  console.log("Starting animation loop...");
-  startAnimation(newScene, newRenderer, gameInstance.character, newCamera);
+    console.log("Setting character...");
+    gameInstance.character = new Character(newScene);
 
-  gameInstance.initialized = true;
-  console.log("Game initialization complete.");
+    // Setup key controls
+    console.log("Setting up key controls...");
+    gameInstance.character.setupControls();
 
-  // Show game instructions
-  MessageSystem.getInstance().showGameInstructions();
+    // Adjust for window resize
+    console.log("Setting up window resize...");
+    setWindowResize(newCamera, newRenderer);
 
-  // Add some additional example instructions
-  setTimeout(() => {
-    MessageSystem.getInstance().addInstruction(
-      "#2 Game Objective",
+    // Start animation loop
+    console.log("Starting animation loop...");
+    startAnimation(newScene, newRenderer, gameInstance.character, newCamera);
+
+    gameInstance.initialized = true;
+    console.log("Game initialization complete.");
+
+    setTimeout(() => {
+      // Hide loading screen
+      MessageSystem.getInstance().hideLoading();
+      // Show game instructions
+      MessageSystem.getInstance().showGameInstructions();
+    }, 1000);
+
+    // Add some additional example instructions
+    setTimeout(() => {
+      MessageSystem.getInstance().addInstruction(
+        "#2 Game Objective",
+        `
+        <p>Explore Shinyeong land.</p>
       `
-      <p>Explore Shinyeong land.</p>
-    `
-    );
-  }, 5000);
+      );
+    }, 5000);
 
-  setTimeout(() => {
-    MessageSystem.getInstance().addInstruction("#3 Test message", "test");
-  }, 10000);
+    setTimeout(() => {
+      MessageSystem.getInstance().addInstruction("#3 Test message", "test");
+    }, 10000);
+  });
 }
 
 // Only start the game if we're in the browser environment
@@ -73,8 +91,8 @@ if (typeof window !== "undefined") {
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
   } else {
-    // Set a small timeout to ensure any previous instance is fully cleaned up
-    setTimeout(init, 100);
+    // Initialize immediately - no loading screen yet
+    init();
   }
 }
 
