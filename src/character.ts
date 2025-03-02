@@ -107,7 +107,6 @@ export class Character {
     }
   }
 
-  // Update character position and rotation
   update(obstacles: THREE.Object3D[]): void {
     // Handle rotation
     if (this.rotateLeft) {
@@ -144,14 +143,34 @@ export class Character {
       this.collider.setFromObject(this.mesh);
 
       // Check collisions with obstacles
-      if (this.checkCollisions(obstacles)) {
-        // Collision detected, revert position
+      if (this.checkCollisions(obstacles) || this.isOutOfBounds()) {
+        // Collision detected or out of bounds, revert position
         this.mesh.position.copy(originalPosition);
         this.mesh.updateMatrix();
         // Update collider to the reverted position
         this.collider.setFromObject(this.mesh);
       }
     }
+  }
+
+  // Add a new method to check if the character is out of bounds
+  isOutOfBounds(): boolean {
+    // Get the floor size (50x50 as defined in background.ts)
+    const floorSize = 50;
+    const halfFloorSize = floorSize / 2;
+
+    // Define a small margin to prevent the character from going exactly to the edge
+    const margin = 0.5; // Half the width of the character
+
+    // Check if character is outside the floor boundaries
+    if (
+      Math.abs(this.mesh.position.x) > halfFloorSize - margin ||
+      Math.abs(this.mesh.position.z) > halfFloorSize - margin
+    ) {
+      return true;
+    }
+
+    return false;
   }
 
   // Check collisions with obstacles
