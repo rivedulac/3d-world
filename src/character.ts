@@ -16,7 +16,7 @@ export function setCharacter(scene: THREE.Scene): THREE.Mesh {
 }
 
 export class Character {
-  character: THREE.Mesh;
+  mesh: THREE.Mesh;
   velocity: THREE.Vector3;
   collider: THREE.Box3;
   rotationSpeed: number = 0.05;
@@ -33,17 +33,17 @@ export class Character {
     const characterMaterial = new THREE.MeshStandardMaterial({
       color: 0x00aaff,
     });
-    this.character = new THREE.Mesh(characterGeometry, characterMaterial);
-    this.character.position.set(0, 0.5, 0);
+    this.mesh = new THREE.Mesh(characterGeometry, characterMaterial);
+    this.mesh.position.set(0, 0.5, 0);
 
     // Create collision box
-    this.collider = new THREE.Box3().setFromObject(this.character);
+    this.collider = new THREE.Box3().setFromObject(this.mesh);
 
     // Initialize velocity
     this.velocity = new THREE.Vector3();
 
     // Add to scene
-    scene.add(this.character);
+    scene.add(this.mesh);
 
     console.log("Character created");
   }
@@ -54,6 +54,10 @@ export class Character {
       console.log("Key controls already set up, skipping...");
       return;
     }
+
+    // Bind the event handlers to the class instance
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onKeyUp = this.onKeyUp.bind(this);
 
     // Remove any existing event listeners first to prevent multiple bindings
     document.removeEventListener("keydown", this.onKeyDown);
@@ -107,10 +111,10 @@ export class Character {
   update(obstacles: THREE.Object3D[]): void {
     // Handle rotation
     if (this.rotateLeft) {
-      this.character.rotation.y += this.rotationSpeed;
+      this.mesh.rotation.y += this.rotationSpeed;
     }
     if (this.rotateRight) {
-      this.character.rotation.y -= this.rotationSpeed;
+      this.mesh.rotation.y -= this.rotationSpeed;
     }
 
     // Reset velocity
@@ -118,38 +122,34 @@ export class Character {
 
     // Calculate movement based on character's rotation
     if (this.moveForward) {
-      this.velocity.x =
-        -Math.sin(this.character.rotation.y) * this.movementSpeed;
-      this.velocity.z =
-        -Math.cos(this.character.rotation.y) * this.movementSpeed;
+      this.velocity.x = -Math.sin(this.mesh.rotation.y) * this.movementSpeed;
+      this.velocity.z = -Math.cos(this.mesh.rotation.y) * this.movementSpeed;
     }
     if (this.moveBackward) {
-      this.velocity.x =
-        Math.sin(this.character.rotation.y) * this.movementSpeed;
-      this.velocity.z =
-        Math.cos(this.character.rotation.y) * this.movementSpeed;
+      this.velocity.x = Math.sin(this.mesh.rotation.y) * this.movementSpeed;
+      this.velocity.z = Math.cos(this.mesh.rotation.y) * this.movementSpeed;
     }
 
     // Only proceed with movement if we're actually moving
     if (this.velocity.lengthSq() > 0) {
       // Store original position for collision detection
-      const originalPosition = this.character.position.clone();
+      const originalPosition = this.mesh.position.clone();
 
       // Move character
-      this.character.position.x += this.velocity.x;
-      this.character.position.z += this.velocity.z;
-      this.character.updateMatrix();
+      this.mesh.position.x += this.velocity.x;
+      this.mesh.position.z += this.velocity.z;
+      this.mesh.updateMatrix();
 
       // Update collider to the new position
-      this.collider.setFromObject(this.character);
+      this.collider.setFromObject(this.mesh);
 
       // Check collisions with obstacles
       if (this.checkCollisions(obstacles)) {
         // Collision detected, revert position
-        this.character.position.copy(originalPosition);
-        this.character.updateMatrix();
+        this.mesh.position.copy(originalPosition);
+        this.mesh.updateMatrix();
         // Update collider to the reverted position
-        this.collider.setFromObject(this.character);
+        this.collider.setFromObject(this.mesh);
       }
     }
   }
@@ -177,12 +177,10 @@ export class Character {
     const cameraHeight = 2;
 
     camera.position.x =
-      this.character.position.x +
-      Math.sin(this.character.rotation.y) * cameraDistance;
+      this.mesh.position.x + Math.sin(this.mesh.rotation.y) * cameraDistance;
     camera.position.z =
-      this.character.position.z +
-      Math.cos(this.character.rotation.y) * cameraDistance;
-    camera.position.y = this.character.position.y + cameraHeight;
-    camera.lookAt(this.character.position);
+      this.mesh.position.z + Math.cos(this.mesh.rotation.y) * cameraDistance;
+    camera.position.y = this.mesh.position.y + cameraHeight;
+    camera.lookAt(this.mesh.position);
   }
 }

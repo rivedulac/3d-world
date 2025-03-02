@@ -1,7 +1,7 @@
 import * as THREE from "three";
+import { gameInstance } from "./gameInstance";
 
-// Store global instances to avoid creating multiple renderers
-let globalRenderer: THREE.WebGLRenderer | null = null;
+// Store global instance of resize handler
 let globalResizeHandler: ((event: UIEvent) => void) | null = null;
 
 export function setScene(): {
@@ -25,23 +25,22 @@ export function setScene(): {
   // Get the canvas element
   const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
 
-  // Reuse existing renderer if available
-  let renderer: THREE.WebGLRenderer;
-  if (globalRenderer) {
-    console.log("Reusing existing renderer");
-    renderer = globalRenderer;
-  } else {
-    // Create a new renderer
-    renderer = new THREE.WebGLRenderer({
-      canvas: canvas,
-      antialias: true,
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-
-    // Store the renderer instance globally
-    globalRenderer = renderer;
+  // If there's an existing renderer in the gameInstance, dispose it properly
+  if (gameInstance.renderer) {
+    console.log("Disposing existing renderer");
+    gameInstance.renderer.dispose();
+    gameInstance.renderer = null;
   }
+
+  // Create a new renderer - Always create a new one to avoid context issues
+  const renderer = new THREE.WebGLRenderer({
+    canvas: canvas,
+    antialias: true,
+    powerPreference: "high-performance", // Optimization
+  });
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
 
   // Lighting and floor creation
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
@@ -71,13 +70,23 @@ export function setWindowResize(
   // Remove any existing resize listeners first
   if (globalResizeHandler) {
     window.removeEventListener("resize", globalResizeHandler);
+    globalResizeHandler = null;
   }
 
   // Create new resize handler
   const resizeHandler = () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    // Make sure we're using the current game instance if available
+    const currentCamera = gameInstance.camera || camera;
+    const currentRenderer = gameInstance.renderer || renderer;
+
+    if (currentCamera && currentCamera instanceof THREE.PerspectiveCamera) {
+      currentCamera.aspect = window.innerWidth / window.innerHeight;
+      currentCamera.updateProjectionMatrix();
+    }
+
+    if (currentRenderer) {
+      currentRenderer.setSize(window.innerWidth, window.innerHeight);
+    }
   };
 
   // Store the handler globally for future cleanup
