@@ -1,13 +1,19 @@
-let scene, renderer, character, camera;
-let moveForward = false;
-let moveBackward = false;
-let rotateLeft = false;
-let rotateRight = false;
-let velocity = new THREE.Vector3();
+import * as THREE from "three";
+
+// Define types for global variables
+let scene: THREE.Scene;
+let renderer: THREE.WebGLRenderer;
+let character: THREE.Mesh;
+let camera: THREE.Camera;
+let moveForward: boolean = false;
+let moveBackward: boolean = false;
+let rotateLeft: boolean = false;
+let rotateRight: boolean = false;
+let velocity: THREE.Vector3 = new THREE.Vector3();
 let rotationSpeed = 0.05;
 let movementSpeed = 0.1;
 
-function onKeyDown(event) {
+function onKeyDown(event: KeyboardEvent): void {
   switch (event.code) {
     case "KeyW":
       moveForward = true;
@@ -24,7 +30,7 @@ function onKeyDown(event) {
   }
 }
 
-function onKeyUp(event) {
+function onKeyUp(event: KeyboardEvent): void {
   switch (event.code) {
     case "KeyW":
       moveForward = false;
@@ -41,12 +47,12 @@ function onKeyUp(event) {
   }
 }
 
-export function setKeyControls() {
+export function setKeyControls(): void {
   document.addEventListener("keydown", onKeyDown);
   document.addEventListener("keyup", onKeyUp);
 }
 
-function updateCharacter(character, camera) {
+function updateCharacter(character: THREE.Mesh, camera: THREE.Camera): void {
   // Handle rotation
   if (rotateLeft) {
     character.rotation.y += rotationSpeed;
@@ -68,7 +74,6 @@ function updateCharacter(character, camera) {
     velocity.x = -Math.sin(character.rotation.y) * movementSpeed;
     velocity.z = -Math.cos(character.rotation.y) * movementSpeed;
   }
-
   // Move character
   character.position.x -= velocity.x;
   character.position.z -= velocity.z;
@@ -84,13 +89,18 @@ function updateCharacter(character, camera) {
   camera.lookAt(character.position);
 }
 
-function animationLoop() {
+function animationLoop(): void {
   requestAnimationFrame(animationLoop);
   updateCharacter(character, camera);
   renderer.render(scene, camera);
 }
 
-export function startAnimation(parScene, parRenderer, parCharacter, parCamera) {
+export function startAnimation(
+  parScene: THREE.Scene,
+  parRenderer: THREE.WebGLRenderer,
+  parCharacter: THREE.Mesh,
+  parCamera: THREE.Camera
+): void {
   scene = parScene;
   renderer = parRenderer;
   character = parCharacter;
