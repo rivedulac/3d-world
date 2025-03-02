@@ -1,8 +1,14 @@
+# Welcome to my land
+
 A simple 3D game built with Three.js.
 
-![Game Screenshot](screenshots/v1.0.png)
+## Live Demo
 
-# How to run
+Play the game: [https://rivedulac.github.io/3d-world/](https://rivedulac.github.io/3d-world/)
 
-1. Run `npm start`
-2. Go to `localhost:8000`.
+## Game Controls
+
+- W - Move Forward
+- A - Rotate Left
+- S - Move Backward
+- D - Rotate Right

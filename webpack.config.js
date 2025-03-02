@@ -26,6 +26,7 @@ module.exports = {
     filename: "[name].bundle.js", // Use [name] placeholder to avoid conflicts
     path: path.resolve(__dirname, "dist"),
     clean: true, // Clean the output directory before emit
+    publicPath: "./",
   },
   plugins: [
     // Generate index.html in the dist folder
@@ -33,10 +34,15 @@ module.exports = {
       template: "./index.html",
       filename: "index.html",
       inject: "body", // Inject all javascript resources in body
+      scriptLoading: "defer",
     }),
     // Copy other static assets
     new CopyWebpackPlugin({
-      patterns: [{ from: "styles.css", to: "" }],
+      patterns: [
+        { from: "styles.css", to: "" },
+        { from: "src/favicon.ico", to: "" },
+        { from: ".nojekyll", to: "" },
+      ],
     }),
   ],
   devServer: {
