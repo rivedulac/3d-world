@@ -3,7 +3,7 @@ import { setScene, setWindowResize } from "./background";
 import { Character } from "./character";
 import { addEnvironmentObjects } from "./object";
 import { gameInstance, cleanupGameInstance } from "./gameInstance";
-import * as THREE from "three";
+import { MessageSystem } from "./message";
 
 // Initialize the game
 function init(): void {
@@ -48,6 +48,9 @@ function init(): void {
 
   gameInstance.initialized = true;
   console.log("Game initialization complete.");
+
+  // Show game instructions
+  MessageSystem.getInstance().showGameInstructions();
 }
 
 // Only start the game if we're in the browser environment
