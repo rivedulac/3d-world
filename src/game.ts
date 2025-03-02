@@ -3,7 +3,7 @@ import { setScene, setWindowResize } from "./background";
 import { Character } from "./character";
 import { addEnvironmentObjects } from "./object";
 import { gameInstance, cleanupGameInstance } from "./gameInstance";
-import { MessageSystem } from "./message";
+import { MessageSystem, MessageType } from "./message";
 
 // Initialize the game
 function init(): void {
@@ -51,6 +51,20 @@ function init(): void {
 
   // Show game instructions
   MessageSystem.getInstance().showGameInstructions();
+
+  // Add some additional example instructions
+  setTimeout(() => {
+    MessageSystem.getInstance().addInstruction(
+      "#2 Game Objective",
+      `
+      <p>Explore Shinyeong land.</p>
+    `
+    );
+  }, 5000);
+
+  setTimeout(() => {
+    MessageSystem.getInstance().addInstruction("#3 Test message", "test");
+  }, 10000);
 }
 
 // Only start the game if we're in the browser environment
