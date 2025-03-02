@@ -1,4 +1,6 @@
 const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: "./src/game.ts",
@@ -23,6 +25,17 @@ module.exports = {
     filename: "bundle.js",
     path: path.resolve(__dirname, "dist"),
   },
+  plugins: [
+    // Generate index.html in the dist folder
+    new HtmlWebpackPlugin({
+      template: "./index.html",
+      filename: "index.html",
+    }),
+    // Copy other static assets
+    new CopyWebpackPlugin({
+      patterns: [{ from: "styles.css", to: "" }],
+    }),
+  ],
   devServer: {
     static: path.join(__dirname, "dist"),
     compress: true,
