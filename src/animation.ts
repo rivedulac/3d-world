@@ -12,6 +12,7 @@ let rotateRight: boolean = false;
 let velocity: THREE.Vector3 = new THREE.Vector3();
 let rotationSpeed = 0.05;
 let movementSpeed = 0.1;
+let animationFrameId: number | null = null;
 
 function onKeyDown(event: KeyboardEvent): void {
   switch (event.code) {
@@ -47,9 +48,26 @@ function onKeyUp(event: KeyboardEvent): void {
   }
 }
 
+// Track whether we've set up key controls already
+let keyControlsSetup = false;
+
 export function setKeyControls(): void {
+  // Prevent double-binding of event listeners
+  if (keyControlsSetup) {
+    console.log("Key controls already set up, skipping...");
+    return;
+  }
+
+  // Remove any existing event listeners first (safeguard)
+  document.removeEventListener("keydown", onKeyDown);
+  document.removeEventListener("keyup", onKeyUp);
+
+  // Add new event listeners
   document.addEventListener("keydown", onKeyDown);
   document.addEventListener("keyup", onKeyUp);
+
+  keyControlsSetup = true;
+  console.log("Key controls set up");
 }
 
 function updateCharacter(character: THREE.Mesh, camera: THREE.Camera): void {
@@ -90,9 +108,17 @@ function updateCharacter(character: THREE.Mesh, camera: THREE.Camera): void {
 }
 
 function animationLoop(): void {
-  requestAnimationFrame(animationLoop);
+  animationFrameId = requestAnimationFrame(animationLoop);
   updateCharacter(character, camera);
   renderer.render(scene, camera);
+}
+
+export function stopAnimation(): void {
+  if (animationFrameId !== null) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+    console.log("Animation stopped");
+  }
 }
 
 export function startAnimation(
@@ -101,9 +127,14 @@ export function startAnimation(
   parCharacter: THREE.Mesh,
   parCamera: THREE.Camera
 ): void {
+  // Stop any existing animation first
+  stopAnimation();
+
   scene = parScene;
   renderer = parRenderer;
   character = parCharacter;
   camera = parCamera;
+
+  console.log("Animation started");
   animationLoop();
 }

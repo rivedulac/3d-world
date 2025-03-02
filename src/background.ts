@@ -1,5 +1,9 @@
 import * as THREE from "three";
 
+// Store global instances to avoid creating multiple renderers
+let globalRenderer: THREE.WebGLRenderer | null = null;
+let globalResizeHandler: ((event: UIEvent) => void) | null = null;
+
 export function setScene(): {
   scene: THREE.Scene;
   camera: THREE.PerspectiveCamera;
@@ -18,14 +22,28 @@ export function setScene(): {
   camera.position.set(0, 2, 5);
   camera.lookAt(0, 1, 0);
 
-  const renderer = new THREE.WebGLRenderer({
-    canvas: document.getElementById("gameCanvas") as HTMLCanvasElement,
-    antialias: true,
-  });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
+  // Get the canvas element
+  const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement;
 
-  // Lighting and floor creation remain the same
+  // Reuse existing renderer if available
+  let renderer: THREE.WebGLRenderer;
+  if (globalRenderer) {
+    console.log("Reusing existing renderer");
+    renderer = globalRenderer;
+  } else {
+    // Create a new renderer
+    renderer = new THREE.WebGLRenderer({
+      canvas: canvas,
+      antialias: true,
+    });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+
+    // Store the renderer instance globally
+    globalRenderer = renderer;
+  }
+
+  // Lighting and floor creation
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
   scene.add(ambientLight);
 
@@ -50,9 +68,19 @@ export function setWindowResize(
   camera: THREE.PerspectiveCamera,
   renderer: THREE.WebGLRenderer
 ): void {
-  window.addEventListener("resize", () => {
+  // Remove any existing resize listeners first
+  if (globalResizeHandler) {
+    window.removeEventListener("resize", globalResizeHandler);
+  }
+
+  // Create new resize handler
+  const resizeHandler = () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-  });
+  };
+
+  // Store the handler globally for future cleanup
+  globalResizeHandler = resizeHandler;
+  window.addEventListener("resize", resizeHandler);
 }
