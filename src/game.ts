@@ -1,23 +1,22 @@
-import { setKeyControls, startAnimation } from "./animation";
+import { startAnimation } from "./animation";
 import { setScene, setWindowResize } from "./background";
-import { setCharacter } from "./character";
+import { Character } from "./character";
 import { addEnvironmentObjects } from "./object";
+import { gameInstance, cleanupGameInstance } from "./gameInstance";
 import * as THREE from "three";
-
-// Game variables
-let scene: THREE.Scene;
-let camera: THREE.PerspectiveCamera;
-let renderer: THREE.WebGLRenderer;
-let character: THREE.Mesh;
-let isInitialized = false;
 
 // Initialize the game
 function init(): void {
   // Prevent double initialization
-  if (isInitialized) {
+  if (gameInstance.initialized) {
     console.log("Game already initialized, skipping...");
     return;
   }
+
+  // Clean up any existing instance first
+  cleanupGameInstance();
+
+  console.log("Starting game initialization...");
 
   const {
     scene: newScene,
@@ -25,23 +24,29 @@ function init(): void {
     renderer: newRenderer,
   } = setScene();
 
-  scene = newScene;
-  camera = newCamera;
-  renderer = newRenderer;
+  gameInstance.scene = newScene;
+  gameInstance.camera = newCamera;
+  gameInstance.renderer = newRenderer;
 
-  addEnvironmentObjects(scene);
-  character = setCharacter(scene);
+  console.log("Setting up environment objects...");
+  addEnvironmentObjects(newScene);
+
+  console.log("Setting character...");
+  gameInstance.character = new Character(newScene);
 
   // Setup key controls
-  setKeyControls();
+  console.log("Setting up key controls...");
+  gameInstance.character.setupControls();
 
   // Adjust for window resize
-  setWindowResize(camera, renderer);
+  console.log("Setting up window resize...");
+  setWindowResize(newCamera, newRenderer);
 
   // Start animation loop
-  startAnimation(scene, renderer, character, camera);
+  console.log("Starting animation loop...");
+  startAnimation(newScene, newRenderer, gameInstance.character, newCamera);
 
-  isInitialized = true;
+  gameInstance.initialized = true;
   console.log("Game initialization complete.");
 }
 
@@ -51,9 +56,30 @@ if (typeof window !== "undefined") {
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init);
   } else {
-    init();
+    // Set a small timeout to ensure any previous instance is fully cleaned up
+    setTimeout(init, 100);
   }
 }
 
+// Handle hot module replacement for development
+// @ts-ignore: Ignoring TS error for module.hot which is provided by webpack
+if (module.hot) {
+  // @ts-ignore: Ignoring TS error for module.hot
+  module.hot.dispose(() => {
+    console.log("Hot module replacement - cleaning up");
+    cleanupGameInstance();
+  });
+
+  // @ts-ignore: Ignoring TS error for module.hot
+  module.hot.accept(() => {
+    console.log("Hot module replacement - reinitializing");
+    setTimeout(() => {
+      if (!gameInstance.initialized) {
+        init();
+      }
+    }, 300);
+  });
+}
+
 // Export for module hot reloading support
-export { init };
+export { init, cleanupGameInstance };
