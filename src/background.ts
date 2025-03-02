@@ -1,14 +1,15 @@
-// Set the scene
-export function setScene() {
-  console.log("Setting up 3D world...");
-  let scene, camera, renderer;
+import * as THREE from "three";
 
-  // Create scene
-  scene = new THREE.Scene();
+export function setScene(): {
+  scene: THREE.Scene;
+  camera: THREE.PerspectiveCamera;
+  renderer: THREE.WebGLRenderer;
+} {
+  console.log("Setting up 3D world...");
+  const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xadd8e6);
 
-  // Create camera
-  camera = new THREE.PerspectiveCamera(
+  const camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     0.1,
@@ -17,15 +18,14 @@ export function setScene() {
   camera.position.set(0, 2, 5);
   camera.lookAt(0, 1, 0);
 
-  // Create renderer
-  renderer = new THREE.WebGLRenderer({
-    canvas: document.getElementById("gameCanvas"),
+  const renderer = new THREE.WebGLRenderer({
+    canvas: document.getElementById("gameCanvas") as HTMLCanvasElement,
     antialias: true,
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
 
-  // Add lighting
+  // Lighting and floor creation remain the same
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
   scene.add(ambientLight);
 
@@ -33,7 +33,6 @@ export function setScene() {
   directionalLight.position.set(1, 1, 1);
   scene.add(directionalLight);
 
-  // Create grass floor
   const floorGeometry = new THREE.PlaneGeometry(50, 50);
   const floorMaterial = new THREE.MeshStandardMaterial({
     roughness: 0.8,
@@ -43,10 +42,14 @@ export function setScene() {
   floor.rotation.x = -Math.PI / 2;
   floor.position.y = 0;
   scene.add(floor);
+
   return { scene, camera, renderer };
 }
 
-export function setWindowResize(camera, renderer) {
+export function setWindowResize(
+  camera: THREE.PerspectiveCamera,
+  renderer: THREE.WebGLRenderer
+): void {
   window.addEventListener("resize", () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();

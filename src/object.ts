@@ -1,8 +1,11 @@
+import * as THREE from "three";
+
 // Create environment objects (trees, rocks, house)
-export function addEnvironmentObjects(scene) {
+export function addEnvironmentObjects(scene: THREE.Scene): void {
   console.log("Adding environment objects...");
+
   // Create trees
-  function createTree(x, z) {
+  function createTree(x: number, z: number): void {
     const trunkGeometry = new THREE.CylinderGeometry(0.2, 0.3, 1.5, 8);
     const trunkMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513 });
     const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
@@ -18,7 +21,7 @@ export function addEnvironmentObjects(scene) {
   }
 
   // Create rocks
-  function createRock(x, z, scale) {
+  function createRock(x: number, z: number, scale: number): void {
     const rockGeometry = new THREE.DodecahedronGeometry(scale, 0);
     const rockMaterial = new THREE.MeshStandardMaterial({
       color: 0x888888,
@@ -31,7 +34,7 @@ export function addEnvironmentObjects(scene) {
   }
 
   // Create simple house
-  function createHouse(x, z) {
+  function createHouse(x: number, z: number): void {
     // House base
     const baseGeometry = new THREE.BoxGeometry(4, 2.5, 3);
     const baseMaterial = new THREE.MeshStandardMaterial({ color: 0xd2b48c });
