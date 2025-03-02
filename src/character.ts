@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { checkNPCInteractions } from "./npc";
 
 // Set the character
 export function setCharacter(scene: THREE.Scene): THREE.Mesh {
@@ -151,6 +152,9 @@ export class Character {
         this.collider.setFromObject(this.mesh);
       }
     }
+
+    // Check for NPC interactions
+    checkNPCInteractions(this.mesh.position);
   }
 
   // Add a new method to check if the character is out of bounds

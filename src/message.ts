@@ -15,27 +15,43 @@ interface StoredInstruction {
 }
 
 export class MessageSystem {
-  private messageElement: HTMLDivElement;
+  private instructionElement: HTMLDivElement;
+  private conversationElement: HTMLDivElement;
   private instructionsButton: HTMLButtonElement;
   private instructionsListElement: HTMLDivElement;
   private storedInstructions: StoredInstruction[] = [];
   private static instance: MessageSystem | null = null;
-  private currentlyShowingMessage: boolean = false;
+  private currentlyShowingInstruction: boolean = false;
+  private currentlyShowingConversation: boolean = false;
 
   private constructor() {
-    // Create message container
-    this.messageElement = document.createElement("div");
-    this.messageElement.style.position = "absolute";
-    this.messageElement.style.top = "20px";
-    this.messageElement.style.left = "20px";
-    this.messageElement.style.backgroundColor = "rgba(50, 50, 50, 0.8)";
-    this.messageElement.style.color = "white";
-    this.messageElement.style.padding = "20px";
-    this.messageElement.style.borderRadius = "5px";
-    this.messageElement.style.fontFamily = "Arial, sans-serif";
-    this.messageElement.style.zIndex = "1000";
-    this.messageElement.style.display = "none";
-    this.messageElement.style.maxWidth = "300px";
+    // Create instruction container (top left)
+    this.instructionElement = document.createElement("div");
+    this.instructionElement.style.position = "absolute";
+    this.instructionElement.style.top = "20px";
+    this.instructionElement.style.left = "20px";
+    this.instructionElement.style.backgroundColor = "rgba(50, 50, 50, 0.8)";
+    this.instructionElement.style.color = "white";
+    this.instructionElement.style.padding = "20px";
+    this.instructionElement.style.borderRadius = "5px";
+    this.instructionElement.style.fontFamily = "Arial, sans-serif";
+    this.instructionElement.style.zIndex = "1000";
+    this.instructionElement.style.display = "none";
+    this.instructionElement.style.maxWidth = "300px";
+
+    // Create conversation container (top right)
+    this.conversationElement = document.createElement("div");
+    this.conversationElement.style.position = "absolute";
+    this.conversationElement.style.top = "20px";
+    this.conversationElement.style.right = "20px"; // Right side positioning
+    this.conversationElement.style.backgroundColor = "rgba(255, 255, 255, 0.8)"; // White background
+    this.conversationElement.style.color = "black"; // Black text
+    this.conversationElement.style.padding = "20px";
+    this.conversationElement.style.borderRadius = "5px";
+    this.conversationElement.style.fontFamily = "Arial, sans-serif";
+    this.conversationElement.style.zIndex = "1000";
+    this.conversationElement.style.display = "none";
+    this.conversationElement.style.maxWidth = "300px";
 
     // Create instructions button
     this.instructionsButton = document.createElement("button");
@@ -71,14 +87,15 @@ export class MessageSystem {
     this.instructionsListElement.style.maxHeight = "400px";
     this.instructionsListElement.style.overflowY = "auto";
 
-    // Add event listeners
+    // Add event listeners for Escape key
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
-        this.hide();
+        this.hideAll();
       }
     });
 
-    document.body.appendChild(this.messageElement);
+    document.body.appendChild(this.instructionElement);
+    document.body.appendChild(this.conversationElement);
     document.body.appendChild(this.instructionsButton);
     document.body.appendChild(this.instructionsListElement);
 
@@ -116,38 +133,64 @@ export class MessageSystem {
       ">×</div>
     `;
 
-    // Add the close button to the message
-    this.messageElement.innerHTML = closeButton + message;
-    this.messageElement.style.display = "block";
-    this.instructionsButton.style.display = "none";
-    this.instructionsListElement.style.display = "none";
-    this.currentlyShowingMessage = true;
-
-    // Add event listener to the close button
-    const closeButtonElement =
-      this.messageElement.querySelector(".close-button");
-    if (closeButtonElement) {
-      closeButtonElement.addEventListener("click", (e) => {
-        e.stopPropagation(); // Prevent event from bubbling to the message element
-        this.hide();
-      });
-    }
-
-    // Store instruction if it's an instruction type
     if (type === MessageType.INSTRUCTION) {
-      // Extract title from message (assuming it's in an h3 tag)
+      // Add the close button to the instruction message
+      this.instructionElement.innerHTML = closeButton + message;
+      this.instructionElement.style.display = "block";
+      this.instructionsButton.style.display = "none";
+      this.instructionsListElement.style.display = "none";
+      this.currentlyShowingInstruction = true;
+
+      // Store instruction
       const titleMatch = message.match(/<h3>(.*?)<\/h3>/);
       const title = titleMatch ? titleMatch[1] : "Untitled Instruction";
-
       this.storeInstruction(title, message);
+    } else {
+      // Add the close button to the conversation message
+      this.conversationElement.innerHTML = closeButton + message;
+      this.conversationElement.style.display = "block";
+      this.currentlyShowingConversation = true;
+    }
+
+    // Add event listener to the close button
+    const targetElement =
+      type === MessageType.INSTRUCTION
+        ? this.instructionElement
+        : this.conversationElement;
+
+    const closeButtonElement = targetElement.querySelector(".close-button");
+    if (closeButtonElement) {
+      closeButtonElement.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent event from bubbling
+        if (type === MessageType.INSTRUCTION) {
+          this.hideInstruction();
+        } else {
+          this.hideConversation();
+        }
+      });
     }
   }
 
-  public hide(): void {
-    this.messageElement.style.display = "none";
+  public hideAll(): void {
+    this.hideInstruction();
+    this.hideConversation();
+  }
+
+  public hideInstruction(): void {
+    this.instructionElement.style.display = "none";
     this.instructionsListElement.style.display = "none";
     this.instructionsButton.style.display = "block";
-    this.currentlyShowingMessage = false;
+    this.currentlyShowingInstruction = false;
+  }
+
+  public hideConversation(): void {
+    this.conversationElement.style.display = "none";
+    this.currentlyShowingConversation = false;
+  }
+
+  // For backward compatibility, hide() will hide both message types
+  public hide(): void {
+    this.hideAll();
   }
 
   public showGameInstructions(): void {
@@ -189,7 +232,6 @@ export class MessageSystem {
     }
 
     // Get instructions in chronological order (oldest first)
-    // This fixes the index reversal issue
     const orderedInstructions = [...this.storedInstructions].sort(
       (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
     );
@@ -256,17 +298,17 @@ export class MessageSystem {
 
   public showLoading(): void {
     // Save original styles to restore later
-    const originalPosition = this.messageElement.style.position;
-    const originalTop = this.messageElement.style.top;
-    const originalLeft = this.messageElement.style.left;
-    const originalMaxWidth = this.messageElement.style.maxWidth;
+    const originalPosition = this.instructionElement.style.position;
+    const originalTop = this.instructionElement.style.top;
+    const originalLeft = this.instructionElement.style.left;
+    const originalMaxWidth = this.instructionElement.style.maxWidth;
 
     // Center the message on screen
-    this.messageElement.style.position = "absolute";
-    this.messageElement.style.top = "50%";
-    this.messageElement.style.left = "50%";
-    this.messageElement.style.transform = "translate(-50%, -50%)";
-    this.messageElement.style.maxWidth = "300px";
+    this.instructionElement.style.position = "absolute";
+    this.instructionElement.style.top = "50%";
+    this.instructionElement.style.left = "50%";
+    this.instructionElement.style.transform = "translate(-50%, -50%)";
+    this.instructionElement.style.maxWidth = "300px";
 
     const loadingMessage = `
     <div style="text-align: center;">
@@ -289,10 +331,10 @@ export class MessageSystem {
     </style>
   `;
 
-    this.messageElement.innerHTML = loadingMessage;
-    this.messageElement.style.display = "block";
+    this.instructionElement.innerHTML = loadingMessage;
+    this.instructionElement.style.display = "block";
     this.instructionsButton.style.display = "none";
-    this.currentlyShowingMessage = true;
+    this.currentlyShowingInstruction = true;
 
     // Store original positions for restoring later
     this._originalStyles = {
@@ -306,15 +348,15 @@ export class MessageSystem {
   public hideLoading(): void {
     // Restore original position styles before hiding
     if (this._originalStyles) {
-      this.messageElement.style.position = this._originalStyles.position;
-      this.messageElement.style.top = this._originalStyles.top;
-      this.messageElement.style.left = this._originalStyles.left;
-      this.messageElement.style.maxWidth = this._originalStyles.maxWidth;
-      this.messageElement.style.transform = ""; // Remove transform
+      this.instructionElement.style.position = this._originalStyles.position;
+      this.instructionElement.style.top = this._originalStyles.top;
+      this.instructionElement.style.left = this._originalStyles.left;
+      this.instructionElement.style.maxWidth = this._originalStyles.maxWidth;
+      this.instructionElement.style.transform = ""; // Remove transform
       this._originalStyles = null;
     }
 
-    this.hide();
+    this.hideAll();
   }
 
   // Add a new instruction
@@ -323,8 +365,20 @@ export class MessageSystem {
     this.show(formattedContent, MessageType.INSTRUCTION);
   }
 
-  // Check if currently showing a message
+  // Check if currently showing a message (either type)
   public isShowingMessage(): boolean {
-    return this.currentlyShowingMessage;
+    return (
+      this.currentlyShowingInstruction || this.currentlyShowingConversation
+    );
+  }
+
+  // Check if showing an instruction specifically
+  public isShowingInstruction(): boolean {
+    return this.currentlyShowingInstruction;
+  }
+
+  // Check if showing a conversation specifically
+  public isShowingConversation(): boolean {
+    return this.currentlyShowingConversation;
   }
 }

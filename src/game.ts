@@ -3,7 +3,8 @@ import { setScene, setWindowResize } from "./background";
 import { Character } from "./character";
 import { addEnvironmentObjects } from "./object";
 import { gameInstance, cleanupGameInstance } from "./gameInstance";
-import { MessageSystem, MessageType } from "./message";
+import { MessageSystem } from "./message";
+import { npcs } from "./npc";
 
 // Initialize the game
 function init(): void {
@@ -40,6 +41,7 @@ function init(): void {
   requestAnimationFrame(() => {
     console.log("Setting up environment objects...");
     addEnvironmentObjects(newScene);
+    npcs.forEach((npc) => npc.createMesh(newScene));
 
     // Render another frame to show environment objects being added
     newRenderer.render(newScene, newCamera);
