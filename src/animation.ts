@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import { Character } from "./character";
 import { gameInstance } from "./gameInstance";
+import { checkBillboardInteractions, billboards } from "./billboard";
 
 let obstacles: THREE.Object3D[] = [];
 
+// Update the setObstacles function to include billboards
 export function setObstacles(gameScene: THREE.Scene): THREE.Object3D[] {
   const sceneObstacles: THREE.Object3D[] = [];
 
@@ -33,6 +35,7 @@ export function setObstacles(gameScene: THREE.Scene): THREE.Object3D[] {
   return sceneObstacles;
 }
 
+// Update the animationLoop function to include billboard interactions
 function animationLoop(): void {
   if (
     !gameInstance.scene ||
@@ -47,6 +50,10 @@ function animationLoop(): void {
   gameInstance.animationId = requestAnimationFrame(animationLoop);
   gameInstance.character.update(obstacles);
   gameInstance.character.updateCamera(gameInstance.camera);
+
+  // Add this line to check for billboard interactions
+  checkBillboardInteractions(gameInstance.character.mesh.position);
+
   gameInstance.renderer.render(gameInstance.scene, gameInstance.camera);
 }
 
