@@ -9,6 +9,8 @@ Play the game: [https://rivedulac.github.io/3d-world/](https://rivedulac.github.
 ## Game Controls
 
 - W - Move Forward
-- A - Rotate Left
 - S - Move Backward
-- D - Rotate Right
+- ← - Rotate Left
+- → - Rotate Right
+- ↑ - Look Up (Max 60°)
+- ↓ - Look Down (Max 30°)

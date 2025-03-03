@@ -26,6 +26,11 @@ export class Character {
   moveBackward: boolean = false;
   rotateLeft: boolean = false;
   rotateRight: boolean = false;
+  lookUp: boolean = false;
+  lookDown: boolean = false;
+  currentPitch: number = 0;
+  maxPitchUp: number = Math.PI / 4; // 45 degrees up
+  maxPitchDown: number = Math.PI / 6; // 30 degrees down
   keyControlsSetup = false;
 
   constructor(scene: THREE.Scene) {
@@ -78,13 +83,19 @@ export class Character {
       case "KeyW":
         this.moveForward = true;
         break;
-      case "KeyA":
-        this.rotateLeft = true;
-        break;
       case "KeyS":
         this.moveBackward = true;
         break;
-      case "KeyD":
+      case "ArrowUp":
+        this.lookUp = true;
+        break;
+      case "ArrowDown":
+        this.lookDown = true;
+        break;
+      case "ArrowLeft":
+        this.rotateLeft = true;
+        break;
+      case "ArrowRight":
         this.rotateRight = true;
         break;
     }
@@ -96,25 +107,47 @@ export class Character {
       case "KeyW":
         this.moveForward = false;
         break;
-      case "KeyA":
-        this.rotateLeft = false;
-        break;
       case "KeyS":
         this.moveBackward = false;
         break;
-      case "KeyD":
+      case "ArrowUp":
+        this.lookUp = false;
+        break;
+      case "ArrowDown":
+        this.lookDown = false;
+        break;
+      case "ArrowLeft":
+        this.rotateLeft = false;
+        break;
+      case "ArrowRight":
         this.rotateRight = false;
         break;
     }
   }
 
   update(obstacles: THREE.Object3D[]): void {
-    // Handle rotation
+    // Handle yaw rotation (left/right)
     if (this.rotateLeft) {
       this.mesh.rotation.y += this.rotationSpeed;
     }
     if (this.rotateRight) {
       this.mesh.rotation.y -= this.rotationSpeed;
+    }
+
+    // Handle pitch rotation (up/down)
+    if (this.lookUp) {
+      // Increase pitch (look up) with limit
+      this.currentPitch = Math.min(
+        this.currentPitch + this.rotationSpeed,
+        this.maxPitchUp
+      );
+    }
+    if (this.lookDown) {
+      // Decrease pitch (look down) with limit
+      this.currentPitch = Math.max(
+        this.currentPitch - this.rotationSpeed,
+        -this.maxPitchDown
+      );
     }
 
     // Reset velocity
@@ -194,16 +227,31 @@ export class Character {
     return false;
   }
 
-  // Update camera to follow character
+  // Update camera to follow character with pitch
   updateCamera(camera: THREE.Camera): void {
     const cameraDistance = 5;
-    const cameraHeight = 2;
+    const baseCameraHeight = 2;
 
-    camera.position.x =
-      this.mesh.position.x + Math.sin(this.mesh.rotation.y) * cameraDistance;
-    camera.position.z =
-      this.mesh.position.z + Math.cos(this.mesh.rotation.y) * cameraDistance;
-    camera.position.y = this.mesh.position.y + cameraHeight;
-    camera.lookAt(this.mesh.position);
+    // Calculate camera position based on yaw rotation (left/right)
+    const xOffset = Math.sin(this.mesh.rotation.y) * cameraDistance;
+    const zOffset = Math.cos(this.mesh.rotation.y) * cameraDistance;
+
+    // Calculate vertical offset based on pitch
+    const verticalOffset = Math.sin(this.currentPitch) * cameraDistance;
+
+    // Set camera position with pitch adjustment
+    camera.position.x = this.mesh.position.x + xOffset;
+    camera.position.z = this.mesh.position.z + zOffset;
+    camera.position.y =
+      this.mesh.position.y + baseCameraHeight - verticalOffset;
+
+    // Calculate look-at point with pitch
+    const lookAtPoint = new THREE.Vector3(
+      this.mesh.position.x,
+      this.mesh.position.y + 1 + Math.tan(this.currentPitch) * 3, // Adjust height based on pitch
+      this.mesh.position.z
+    );
+
+    camera.lookAt(lookAtPoint);
   }
 }
