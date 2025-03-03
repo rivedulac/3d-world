@@ -23,8 +23,14 @@ export class MessageSystem {
   private static instance: MessageSystem | null = null;
   private currentlyShowingInstruction: boolean = false;
   private currentlyShowingConversation: boolean = false;
+  // Add property to detect touch devices
+  private isTouchDevice: boolean = false;
 
   private constructor() {
+    // Detect if it's a touch device
+    this.isTouchDevice =
+      "ontouchstart" in window || navigator.maxTouchPoints > 0;
+
     // Create instruction container (top left)
     this.instructionElement = document.createElement("div");
     this.instructionElement.style.position = "absolute";
@@ -38,6 +44,13 @@ export class MessageSystem {
     this.instructionElement.style.zIndex = "1000";
     this.instructionElement.style.display = "none";
     this.instructionElement.style.maxWidth = "300px";
+    // Add max-height with scrolling for mobile
+    this.instructionElement.style.maxHeight = this.isTouchDevice
+      ? "50vh"
+      : "auto";
+    this.instructionElement.style.overflowY = this.isTouchDevice
+      ? "auto"
+      : "visible";
 
     // Create conversation container (top right)
     this.conversationElement = document.createElement("div");
@@ -52,6 +65,13 @@ export class MessageSystem {
     this.conversationElement.style.zIndex = "1000";
     this.conversationElement.style.display = "none";
     this.conversationElement.style.maxWidth = "300px";
+    // Add max-height with scrolling for mobile
+    this.conversationElement.style.maxHeight = this.isTouchDevice
+      ? "40vh"
+      : "auto";
+    this.conversationElement.style.overflowY = this.isTouchDevice
+      ? "auto"
+      : "visible";
 
     // Create instructions button
     this.instructionsButton = document.createElement("button");
@@ -66,6 +86,11 @@ export class MessageSystem {
     this.instructionsButton.style.borderRadius = "4px";
     this.instructionsButton.style.cursor = "pointer";
     this.instructionsButton.style.zIndex = "999";
+    // Make button larger on touch devices
+    if (this.isTouchDevice) {
+      this.instructionsButton.style.padding = "12px 16px";
+      this.instructionsButton.style.fontSize = "18px";
+    }
     this.instructionsButton.addEventListener("click", () =>
       this.showInstructionsList()
     );
@@ -73,7 +98,9 @@ export class MessageSystem {
     // Create instructions list container
     this.instructionsListElement = document.createElement("div");
     this.instructionsListElement.style.position = "absolute";
-    this.instructionsListElement.style.top = "60px";
+    this.instructionsListElement.style.top = this.isTouchDevice
+      ? "70px"
+      : "60px";
     this.instructionsListElement.style.left = "20px";
     this.instructionsListElement.style.backgroundColor =
       "rgba(70, 70, 70, 0.9)";
@@ -84,15 +111,41 @@ export class MessageSystem {
     this.instructionsListElement.style.zIndex = "1000";
     this.instructionsListElement.style.display = "none";
     this.instructionsListElement.style.maxWidth = "300px";
-    this.instructionsListElement.style.maxHeight = "400px";
+    this.instructionsListElement.style.maxHeight = this.isTouchDevice
+      ? "50vh"
+      : "400px";
     this.instructionsListElement.style.overflowY = "auto";
 
-    // Add event listeners for Escape key
+    // Add event listeners for Escape key and touch outside
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
         this.hideAll();
       }
     });
+
+    // Add tap outside to close on touch devices
+    if (this.isTouchDevice) {
+      document.addEventListener(
+        "touchstart",
+        (e) => {
+          const target = e.target as Node;
+          if (
+            this.currentlyShowingInstruction ||
+            this.currentlyShowingConversation
+          ) {
+            if (
+              !this.instructionElement.contains(target) &&
+              !this.conversationElement.contains(target) &&
+              !this.instructionsListElement.contains(target) &&
+              target !== this.instructionsButton
+            ) {
+              this.hideAll();
+            }
+          }
+        },
+        { passive: true }
+      );
+    }
 
     document.body.appendChild(this.instructionElement);
     document.body.appendChild(this.conversationElement);
@@ -101,6 +154,38 @@ export class MessageSystem {
 
     // Make sure the button is visible initially
     this.instructionsButton.style.display = "block";
+
+    // Add custom styles for mobile
+    if (this.isTouchDevice) {
+      this.addMobileStyles();
+    }
+  }
+
+  private addMobileStyles(): void {
+    const styleEl = document.createElement("style");
+    styleEl.innerHTML = `
+      @media (max-width: 768px) {
+        /* Ensure buttons are easy to tap */
+        button {
+          min-width: 44px;
+          min-height: 44px;
+        }
+        
+        /* Make text larger */
+        .close-button {
+          width: 30px !important;
+          height: 30px !important;
+          line-height: 30px !important;
+          font-size: 18px !important;
+        }
+        
+        /* Add bottom padding to prevent content from being hidden by virtual keyboard */
+        body {
+          padding-bottom: 150px;
+        }
+      }
+    `;
+    document.head.appendChild(styleEl);
   }
 
   public static getInstance(): MessageSystem {
@@ -195,17 +280,30 @@ export class MessageSystem {
 
   public showGameInstructions(): void {
     const version = pkg.version;
-    const instructions = `
+    let instructions = `
             <h3>Game Controls</h3>
             <p>Version: ${version}</p>
             <h4>Movement:</h4>
             <p>W - Move Forward</p>
             <p>S - Move Backward</p>
-            <p>← - Rotate Left</p>
-            <p>→ - Rotate Right</p>
-            <p>↑ - Look Up (Max 60°)</p>
-            <p>↓ - Look Down (Max 30°)</p>
-        `;
+            <h4>Rotation:</h4>
+            <p>Arrow Left/Right - Turn Left/Right</p>
+            <p>Arrow Up/Down - Look Up/Down</p>
+    `;
+
+    // Add info about virtual controls for touch devices and keyboard button
+    instructions += `
+            <h4>Virtual Controls:</h4>
+            <p>Use the ⌨️ button in the bottom-right corner to show/hide virtual controls.</p>
+    `;
+
+    if (this.isTouchDevice) {
+      instructions += `
+            <p>• Left side: Move forward (W) / backward (S)</p>
+            <p>• Right side: Rotate - arrows for pitch and yaw</p>
+      `;
+    }
+
     this.show(instructions, MessageType.INSTRUCTION);
   }
 
@@ -243,8 +341,12 @@ export class MessageSystem {
       "<h3>Available Instructions</h3><ul style='list-style-type: none; padding: 0;'>";
 
     orderedInstructions.forEach((instruction, index) => {
+      // Make items larger on touch devices
+      const itemPadding = this.isTouchDevice ? "12px" : "8px";
+      const itemMargin = this.isTouchDevice ? "8px 0" : "5px 0";
+
       listHtml += `
-        <li data-index="${index}" style="padding: 8px; margin: 5px 0; background-color: rgba(100, 100, 100, 0.7); 
+        <li data-index="${index}" style="padding: ${itemPadding}; margin: ${itemMargin}; background-color: rgba(100, 100, 100, 0.7); 
         border-radius: 3px; cursor: pointer; transition: background-color 0.2s;">
           ${instruction.title}
         </li>
@@ -382,5 +484,10 @@ export class MessageSystem {
   // Check if showing a conversation specifically
   public isShowingConversation(): boolean {
     return this.currentlyShowingConversation;
+  }
+
+  // Check if this is a touch device
+  public isTouchEnabled(): boolean {
+    return this.isTouchDevice;
   }
 }

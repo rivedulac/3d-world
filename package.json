@@ -1,7 +1,7 @@
 {
   "name": "three-js-game",
-  "version": "1.0.0",
-  "description": "A simple Three.js game",
+  "version": "1.17.5",
+  "description": "My 3D Land",
   "main": "dist/bundle.js",
   "scripts": {
     "start": "webpack serve --open",
