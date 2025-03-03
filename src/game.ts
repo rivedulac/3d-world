@@ -5,6 +5,8 @@ import { addEnvironmentObjects } from "./object";
 import { gameInstance, cleanupGameInstance } from "./gameInstance";
 import { MessageSystem } from "./message";
 import { npcs } from "./npc";
+import { VirtualKeyboard } from "./virtualKeyboard";
+import { KeyboardButton } from "./keyboardButton";
 
 // Initialize the game
 function init(): void {
@@ -49,9 +51,18 @@ function init(): void {
     console.log("Setting character...");
     gameInstance.character = new Character(newScene);
 
+    // Initialize keyboard toggle button first
+    console.log("Setting up keyboard button...");
+    const keyboardButton = KeyboardButton.getInstance();
+
     // Setup key controls
     console.log("Setting up key controls...");
     gameInstance.character.setupControls();
+
+    // Initialize virtual keyboard
+    console.log("Setting up virtual keyboard...");
+    const virtualKeyboard = VirtualKeyboard.getInstance();
+    virtualKeyboard.setCharacter(gameInstance.character);
 
     // Adjust for window resize
     console.log("Setting up window resize...");
@@ -69,6 +80,11 @@ function init(): void {
       MessageSystem.getInstance().hideLoading();
       // Show game instructions
       MessageSystem.getInstance().showGameInstructions();
+
+      // For touch devices, show virtual keyboard and set button state by default
+      if ("ontouchstart" in window || navigator.maxTouchPoints > 0) {
+        virtualKeyboard.show();
+      }
     }, 1000);
 
     // Add some additional example instructions
@@ -91,9 +107,10 @@ function init(): void {
 if (typeof window !== "undefined") {
   // Ensure the DOM is fully loaded before initialization
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", init);
+    document.addEventListener("DOMContentLoaded", () => {
+      init();
+    });
   } else {
-    // Initialize immediately - no loading screen yet
     init();
   }
 }
