@@ -9,3 +9,6 @@ dist/
 
 # Optional eslint cache
 .eslintcache
+
+# Datastore
+*.DS_Store

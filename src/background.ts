@@ -11,7 +11,15 @@ export function setScene(): {
 } {
   console.log("Setting up 3D world...");
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xadd8e6);
+  // scene.background = new THREE.Color(0xadd8e6);
+
+  // Load the starfield image as the background
+  const textureLoader = new THREE.TextureLoader();
+  const galaxyTexture = textureLoader.load("assets/starfield.svg");
+
+  // Set the texture as the scene background
+  // This is much simpler than creating a sphere
+  scene.background = galaxyTexture;
 
   const camera = new THREE.PerspectiveCamera(
     75,
@@ -50,14 +58,19 @@ export function setScene(): {
   directionalLight.position.set(1, 1, 1);
   scene.add(directionalLight);
 
+  // Create a silver floor instead of green
+  const floorTexture = textureLoader.load("assets/silver_floor.svg");
   const floorGeometry = new THREE.PlaneGeometry(50, 50);
   const floorMaterial = new THREE.MeshStandardMaterial({
-    roughness: 0.8,
-    color: 0x4caf50,
+    color: 0xc0c0c0, // Silver color
+    map: floorTexture, // Apply the texture
+    roughness: 0.8, // Less rough for a more metallic feel
+    metalness: 0.1, // Higher metalness for a more reflective appearance
+    envMapIntensity: 0.5, // Control the reflection intensity
   });
   const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-  floor.rotation.x = -Math.PI / 2;
-  floor.position.y = 0;
+  floor.rotation.x = -Math.PI / 2; // Make it horizontal
+  floor.position.y = 0; // Position at ground level
   scene.add(floor);
 
   return { scene, camera, renderer };
