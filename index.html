@@ -1,34 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Simple 3D Game</title>
-    <link rel="stylesheet" href="styles.css" />
-    <base href="./" />
-  </head>
-  <body>
-    <canvas id="gameCanvas"></canvas>
-    <div
-      id="fallback"
-      style="
-        position: absolute;
+<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Simple 3D Game</title><link rel="stylesheet" href="styles.css"/><base href="./"/></head><body><canvas id="gameCanvas"></canvas><div id="fallback" style="position: absolute;
         top: 10px;
         left: 10px;
         color: white;
-        display: none;
-      "
-    >
-      If you see this text, the canvas is not rendering properly.
-    </div>
-    <script type="module">
-      // Show fallback message after 3 seconds if canvas is empty
+        display: none;">If you see this text, the canvas is not rendering properly.</div><script type="module">// Show fallback message after 3 seconds if canvas is empty
       setTimeout(() => {
         const canvas = document.getElementById("gameCanvas");
         if (!canvas || canvas.width === 0) {
           document.getElementById("fallback").style.display = "block";
         }
-      }, 3000);
-    </script>
-  </body>
-</html>
+      }, 3000);</script><script defer="defer" src="./three.bundle.js"></script><script defer="defer" src="./main.bundle.js"></script></body></html>
