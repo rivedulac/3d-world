@@ -1,5 +1,6 @@
 import { startAnimation } from "./animation";
 import { setScene, setWindowResize } from "./background";
+import { billboards } from "./billboard";
 import { Character } from "./character";
 import { addEnvironmentObjects } from "./object";
 import { gameInstance, cleanupGameInstance } from "./gameInstance";
@@ -45,6 +46,7 @@ function init(): void {
     console.log("Setting up environment objects...");
     addEnvironmentObjects(newScene);
     npcs.forEach((npc) => npc.createMesh(newScene));
+    billboards.forEach((billboard) => billboard.createMesh(newScene));
 
     // Render another frame to show environment objects being added
     newRenderer.render(newScene, newCamera);

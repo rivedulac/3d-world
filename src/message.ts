@@ -23,8 +23,9 @@ export class MessageSystem {
   private static instance: MessageSystem | null = null;
   private currentlyShowingInstruction: boolean = false;
   private currentlyShowingConversation: boolean = false;
-  // Add property to detect touch devices
   private isTouchDevice: boolean = false;
+  private announcementElement: HTMLDivElement;
+  private currentlyShowingAnnouncement: boolean = false;
 
   private constructor() {
     // Detect if it's a touch device
@@ -116,6 +117,29 @@ export class MessageSystem {
       : "400px";
     this.instructionsListElement.style.overflowY = "auto";
 
+    // Create centered announcement container
+    this.announcementElement = document.createElement("div");
+    this.announcementElement.style.position = "absolute";
+    this.announcementElement.style.top = "50%";
+    this.announcementElement.style.left = "50%";
+    this.announcementElement.style.transform = "translate(-50%, -50%)";
+    this.announcementElement.style.backgroundColor =
+      "rgba(255, 255, 255, 0.95)";
+    this.announcementElement.style.color = "black";
+    this.announcementElement.style.padding = "25px";
+    this.announcementElement.style.borderRadius = "8px";
+    this.announcementElement.style.fontFamily = "Arial, sans-serif";
+    this.announcementElement.style.zIndex = "1001"; // Higher than other UI elements
+    this.announcementElement.style.display = "none";
+    this.announcementElement.style.maxWidth = "600px";
+    this.announcementElement.style.width = "80%";
+    this.announcementElement.style.maxHeight = this.isTouchDevice
+      ? "80vh"
+      : "70vh";
+    this.announcementElement.style.overflowY = "auto";
+    this.announcementElement.style.boxShadow = "0 5px 15px rgba(0, 0, 0, 0.3)";
+    this.announcementElement.style.border = "1px solid rgba(0, 0, 0, 0.1)";
+
     // Add event listeners for Escape key and touch outside
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
@@ -151,7 +175,7 @@ export class MessageSystem {
     document.body.appendChild(this.conversationElement);
     document.body.appendChild(this.instructionsButton);
     document.body.appendChild(this.instructionsListElement);
-
+    document.body.appendChild(this.announcementElement);
     // Make sure the button is visible initially
     this.instructionsButton.style.display = "block";
 
@@ -259,6 +283,7 @@ export class MessageSystem {
   public hideAll(): void {
     this.hideInstruction();
     this.hideConversation();
+    this.hideAnnouncement();
   }
 
   public hideInstruction(): void {
@@ -467,6 +492,66 @@ export class MessageSystem {
   public addInstruction(title: string, content: string): void {
     const formattedContent = `<h3>${title}</h3>${content}`;
     this.show(formattedContent, MessageType.INSTRUCTION);
+  }
+
+  // Add new showAnnouncement and hideAnnouncement methods
+  public showAnnouncement(message: string): void {
+    // Create close button with X
+    const closeButton = `
+    <div class="close-button" style="
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 30px;
+      height: 30px;
+      background-color: rgba(200, 50, 50, 0.8);
+      border-radius: 50%;
+      text-align: center;
+      line-height: 30px;
+      cursor: pointer;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+      transition: all 0.2s ease;
+    ">×</div>
+  `;
+
+    // Add the close button to the announcement
+    this.announcementElement.innerHTML = closeButton + message;
+    this.announcementElement.style.display = "block";
+    this.currentlyShowingAnnouncement = true;
+
+    // Add event listener to the close button
+    const closeButtonElement =
+      this.announcementElement.querySelector(".close-button");
+    if (closeButtonElement) {
+      closeButtonElement.addEventListener("click", (e) => {
+        e.stopPropagation(); // Prevent event from bubbling
+        this.hideAnnouncement();
+      });
+
+      // Add hover effect
+      closeButtonElement.addEventListener("mouseover", () => {
+        (closeButtonElement as HTMLElement).style.transform = "scale(1.1)";
+        (closeButtonElement as HTMLElement).style.backgroundColor =
+          "rgba(220, 50, 50, 0.9)";
+      });
+
+      closeButtonElement.addEventListener("mouseout", () => {
+        (closeButtonElement as HTMLElement).style.transform = "scale(1)";
+        (closeButtonElement as HTMLElement).style.backgroundColor =
+          "rgba(200, 50, 50, 0.8)";
+      });
+    }
+  }
+
+  public hideAnnouncement(): void {
+    this.announcementElement.style.display = "none";
+    this.currentlyShowingAnnouncement = false;
+  }
+
+  public isShowingAnnouncement(): boolean {
+    return this.currentlyShowingAnnouncement;
   }
 
   // Check if currently showing a message (either type)
