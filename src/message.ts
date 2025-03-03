@@ -200,9 +200,11 @@ export class MessageSystem {
             <p>Version: ${version}</p>
             <h4>Movement:</h4>
             <p>W - Move Forward</p>
-            <p>A - Rotate Left</p>
             <p>S - Move Backward</p>
-            <p>D - Rotate Right</p>
+            <p>← - Rotate Left</p>
+            <p>→ - Rotate Right</p>
+            <p>↑ - Look Up (Max 60°)</p>
+            <p>↓ - Look Down (Max 30°)</p>
         `;
     this.show(instructions, MessageType.INSTRUCTION);
   }
