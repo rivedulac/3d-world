@@ -42,6 +42,7 @@ module.exports = {
         { from: "styles.css", to: "" },
         { from: "src/favicon.ico", to: "" },
         { from: ".nojekyll", to: "" },
+        { from: "assets", to: "assets" },
       ],
     }),
   ],

@@ -24,7 +24,9 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: "styles.css", to: "" },
-        { from: ".nojekyll", to: "" }, // Prevent Jekyll processing
+        { from: "src/favicon.ico", to: "" },
+        { from: ".nojekyll", to: "" },
+        { from: "assets", to: "assets" },
       ],
     }),
     ...(baseConfig.plugins || []).filter(
