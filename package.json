@@ -1,6 +1,6 @@
 {
   "name": "three-js-game",
-  "version": "1.17.5",
+  "version": "1.18.0",
   "description": "My 3D Land",
   "main": "dist/bundle.js",
   "scripts": {

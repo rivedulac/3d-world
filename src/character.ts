@@ -267,4 +267,12 @@ export class Character {
     // Apply the pitch rotation to the camera (maintaining character at center)
     camera.quaternion.multiply(pitchQuaternion);
   }
+
+  // Reset the camera view to its default orientation
+  resetCameraView(): void {
+    // Reset pitch and yaw to 0 (neutral position)
+    this.currentPitch = 0;
+    this.mesh.rotation.y = 0;
+    console.log("Camera view reset");
+  }
 }
