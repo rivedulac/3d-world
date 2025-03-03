@@ -5,6 +5,7 @@ import { addEnvironmentObjects } from "./object";
 import { gameInstance, cleanupGameInstance } from "./gameInstance";
 import { MessageSystem } from "./message";
 import { npcs } from "./npc";
+import { ViewResetButton } from "./viewResetButton";
 import { VirtualKeyboard } from "./virtualKeyboard";
 import { KeyboardButton } from "./keyboardButton";
 
@@ -63,6 +64,10 @@ function init(): void {
     console.log("Setting up virtual keyboard...");
     const virtualKeyboard = VirtualKeyboard.getInstance();
     virtualKeyboard.setCharacter(gameInstance.character);
+
+    // Initialize view reset button
+    console.log("Setting up view reset button...");
+    ViewResetButton.getInstance();
 
     // Adjust for window resize
     console.log("Setting up window resize...");
