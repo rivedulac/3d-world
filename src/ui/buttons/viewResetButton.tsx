@@ -25,16 +25,4 @@ const ViewResetButton: React.FC = () => {
   );
 };
 
-/**
- * Singleton pattern implementation
- */
-let instance: React.ReactElement | null = null;
-
-export const getInstance = (): React.ReactElement => {
-  if (!instance) {
-    instance = <ViewResetButton />;
-  }
-  return instance;
-};
-
 export default ViewResetButton;

@@ -1,7 +1,7 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
-import ViewResetButton, { getInstance } from "../viewResetButton";
+import ViewResetButton from "../viewResetButton";
 import { gameInstance } from "../../../core/gameInstance";
 
 // Mock the gameInstance
@@ -53,19 +53,6 @@ describe("ViewResetButton", () => {
 
     // Check if it has the correct position class
     expect(button).toHaveClass("bottom-right-secondary");
-  });
-
-  test("getInstance returns a singleton instance", () => {
-    // Call getInstance twice
-    const instance1 = getInstance();
-    const instance2 = getInstance();
-
-    // Both calls should return the same instance
-    expect(instance1).toBe(instance2);
-
-    // Render the instance and make sure it works
-    const { container } = render(instance1);
-    expect(container.querySelector("button")).toBeInTheDocument();
   });
 
   test("handles case when character is not available", () => {
