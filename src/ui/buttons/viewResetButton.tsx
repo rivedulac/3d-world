@@ -1,5 +1,5 @@
 import React from "react";
-import { gameInstance } from "../../gameInstance";
+import { gameInstance } from "../../core/gameInstance";
 import CircularButton from "./circularButton";
 
 /**

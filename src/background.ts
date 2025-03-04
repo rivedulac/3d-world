@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { gameInstance } from "./gameInstance";
+import { gameInstance } from "./core/gameInstance";
 
 // Store global instance of resize handler
 let globalResizeHandler: ((event: UIEvent) => void) | null = null;

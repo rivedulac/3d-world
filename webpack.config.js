@@ -3,7 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-  entry: "./src/game.ts",
+  entry: "./src/core/game.ts",
   mode: "development",
   devtool: "source-map",
   module: {

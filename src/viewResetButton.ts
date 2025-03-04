@@ -1,4 +1,4 @@
-import { gameInstance } from "./gameInstance";
+import { gameInstance } from "./core/gameInstance";
 
 export class ViewResetButton {
   private resetButton: HTMLButtonElement;

@@ -2,10 +2,10 @@ import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import ViewResetButton, { getInstance } from "../viewResetButton";
-import { gameInstance } from "../../../gameInstance";
+import { gameInstance } from "../../../core/gameInstance";
 
 // Mock the gameInstance
-jest.mock("../../../gameInstance", () => ({
+jest.mock("../../../core/gameInstance", () => ({
   gameInstance: {
     character: {
       resetCameraView: jest.fn(),
