@@ -51,11 +51,18 @@ module.exports = {
     compress: true,
     port: 9000,
     hot: true,
+    liveReload: true,
+    open: true,
     client: {
       overlay: {
         errors: true,
         warnings: false,
       },
+      progress: true,
+    },
+    watchFiles: ["src/**/*", "index.html", "styles.css"],
+    devMiddleware: {
+      writeToDisk: true,
     },
   },
   optimization: {
