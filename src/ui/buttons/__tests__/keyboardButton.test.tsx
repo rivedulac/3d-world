@@ -3,36 +3,27 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import KeyboardButton from "../keyboardButton";
 
 describe("KeyboardButton", () => {
-  it("renders with correct accessibility attributes", () => {
-    render(<KeyboardButton />);
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
+  it("renders with keyboard emoji icon", () => {
+    render(<KeyboardButton onClick={() => {}} />);
+    expect(screen.getByText("⌨️")).toBeInTheDocument();
+  });
+
+  it("renders with correct accessibility attributes", () => {
+    render(<KeyboardButton onClick={() => {}} />);
     const button = screen.getByRole("button", { name: /toggle keyboard/i });
     expect(button).toBeInTheDocument();
     expect(button).toHaveAttribute("id", "keyboard-btn");
   });
 
-  it("toggles visibility state when clicked", () => {
-    render(<KeyboardButton />);
+  it("calls onClick when clicked", () => {
+    const onClickMock = jest.fn();
+    render(<KeyboardButton onClick={onClickMock} />);
 
-    const button = screen.getByRole("button", { name: /toggle keyboard/i });
-
-    // Initial state
-    expect(button).toBeInTheDocument();
-
-    // Click the button
-    fireEvent.click(button);
-
-    // Verify the button is still present after click
-    expect(button).toBeInTheDocument();
-  });
-
-  it("calls onToggle callback when clicked", () => {
-    const mockOnToggle = jest.fn();
-    render(<KeyboardButton onToggle={mockOnToggle} />);
-
-    const button = screen.getByRole("button", { name: /toggle keyboard/i });
-    fireEvent.click(button);
-
-    expect(mockOnToggle).toHaveBeenCalledWith(true);
+    fireEvent.click(screen.getByText("⌨️"));
+    expect(onClickMock).toHaveBeenCalled();
   });
 });
