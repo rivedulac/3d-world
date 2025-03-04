@@ -14,7 +14,7 @@ export function setScene(): {
 
   // Load the starfield image as the background
   const textureLoader = new THREE.TextureLoader();
-  const galaxyTexture = textureLoader.load("assets/starfield.svg");
+  const galaxyTexture = textureLoader.load("src/assets/starfield.svg");
 
   // Set the texture as the scene background
   // This is much simpler than creating a sphere
@@ -58,7 +58,7 @@ export function setScene(): {
   scene.add(directionalLight);
 
   // Create a silver floor instead of green
-  const floorTexture = textureLoader.load("assets/silver_floor.svg");
+  const floorTexture = textureLoader.load("src/assets/silver_floor.svg");
   const floorGeometry = new THREE.PlaneGeometry(50, 50);
   const floorMaterial = new THREE.MeshStandardMaterial({
     color: 0xc0c0c0, // Silver color
