@@ -1,5 +1,5 @@
 import { startAnimation } from "./animation";
-import { setScene, setWindowResize } from "../background";
+import { setScene, setWindowResize } from "../scene/background";
 import { billboards } from "../billboard";
 import { Character } from "../character";
 import { addEnvironmentObjects } from "../object";
