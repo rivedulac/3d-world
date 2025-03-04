@@ -1,0 +1,126 @@
+.instructions-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 8px 12px;
+  background-color: rgba(50, 50, 50, 0.8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  z-index: 999;
+}
+
+.instruction-container,
+.conversation-container,
+.announcement-container,
+.instructions-list {
+  position: absolute;
+  background-color: rgba(50, 50, 50, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 5px;
+  font-family: Arial, sans-serif;
+  z-index: 1000;
+  max-width: 300px;
+}
+
+.instruction-container {
+  top: 20px;
+  left: 20px;
+}
+
+.conversation-container {
+  top: 20px;
+  right: 20px;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: black;
+}
+
+.announcement-container {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.95);
+  color: black;
+  max-width: 600px;
+  width: 80%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.message-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 255, 255, 0.95);
+  color: black;
+  padding: 25px;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  z-index: 1001;
+  max-width: 600px;
+  width: 80%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  background-color: rgba(200, 50, 50, 0.8);
+  border-radius: 50%;
+  text-align: center;
+  line-height: 30px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  transform: scale(1.1);
+  background-color: rgba(220, 50, 50, 0.9);
+}
+
+.instructions-list {
+  top: 70px;
+  left: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.instructions-list ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.instructions-list li {
+  padding: 8px;
+  margin: 5px 0;
+  background-color: rgba(100, 100, 100, 0.7);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.instructions-list li:hover {
+  background-color: rgba(120, 120, 120, 0.9);
+}
+
+@media (max-width: 768px) {
+  .instructions-button {
+    padding: 12px 16px;
+    font-size: 18px;
+  }
+
+  .message-container {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+}

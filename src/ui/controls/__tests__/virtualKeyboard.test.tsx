@@ -1,51 +1,83 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { VirtualKeyboard } from "../virtualKeyboard";
 
-// Mock touch detection
-Object.defineProperty(window, "ontouchstart", {
-  configurable: true,
-  value: {},
-});
+// Mock console.log to verify it's called
+const consoleSpy = jest.spyOn(console, "log");
 
-Object.defineProperty(navigator, "maxTouchPoints", {
-  configurable: true,
-  value: 1,
-});
+// Mock CircularButton and KeyboardButton
+jest.mock("../../buttons/circularButton", () => ({
+  __esModule: true,
+  default: ({
+    onClick,
+    icon,
+    className,
+  }: {
+    onClick: () => void;
+    icon: string;
+    className?: string;
+  }) => (
+    <button onClick={onClick} className={className}>
+      {icon}
+    </button>
+  ),
+}));
+
+jest.mock("../../buttons/keyboardButton", () => ({
+  __esModule: true,
+  default: ({ onClick }: { onClick: () => void }) => (
+    <button onClick={onClick}>⌨️</button>
+  ),
+}));
 
 describe("VirtualKeyboard", () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    consoleSpy.mockClear();
+    // Mock touch detection
+    Object.defineProperty(window, "ontouchstart", { value: true });
+    Object.defineProperty(navigator, "maxTouchPoints", { value: 1 });
   });
 
-  it("renders keyboard button", () => {
+  it("handles forward button click", async () => {
     render(<VirtualKeyboard />);
-    expect(screen.getByText("⌨️")).toBeInTheDocument();
+    const forwardButton = screen.getByText("W");
+    await userEvent.click(forwardButton);
+    expect(consoleSpy).toHaveBeenCalledWith("Button clicked: forward");
   });
 
-  it("toggles keyboard visibility when button is clicked", () => {
+  it("handles backward button click", async () => {
     render(<VirtualKeyboard />);
-
-    // Initially visible on touch device
-    expect(screen.getByText("Move")).toBeInTheDocument();
-
-    // Click to hide
-    fireEvent.click(screen.getByText("⌨️"));
-    expect(screen.queryByText("Move")).not.toBeInTheDocument();
-
-    // Click to show
-    fireEvent.click(screen.getByText("⌨️"));
-    expect(screen.getByText("Move")).toBeInTheDocument();
+    const backwardButton = screen.getByText("S");
+    await userEvent.click(backwardButton);
+    expect(consoleSpy).toHaveBeenCalledWith("Button clicked: backward");
   });
 
-  it("renders all control buttons when visible", () => {
+  it("handles pitch up button click", async () => {
     render(<VirtualKeyboard />);
+    const pitchUpButton = screen.getByText("▲");
+    await userEvent.click(pitchUpButton);
+    expect(consoleSpy).toHaveBeenCalledWith("Button clicked: pitchUp");
+  });
 
-    expect(screen.getByText("W")).toBeInTheDocument();
-    expect(screen.getByText("S")).toBeInTheDocument();
-    expect(screen.getByText("▲")).toBeInTheDocument();
-    expect(screen.getByText("▼")).toBeInTheDocument();
-    expect(screen.getByText("◀")).toBeInTheDocument();
-    expect(screen.getByText("▶")).toBeInTheDocument();
+  it("handles pitch down button click", async () => {
+    render(<VirtualKeyboard />);
+    const pitchDownButton = screen.getByText("▼");
+    await userEvent.click(pitchDownButton);
+    expect(consoleSpy).toHaveBeenCalledWith("Button clicked: pitchDown");
+  });
+
+  it("handles yaw left button click", async () => {
+    render(<VirtualKeyboard />);
+    const yawLeftButton = screen.getByText("◀");
+    await userEvent.click(yawLeftButton);
+    expect(consoleSpy).toHaveBeenCalledWith("Button clicked: yawLeft");
+  });
+
+  it("handles yaw right button click", async () => {
+    render(<VirtualKeyboard />);
+    const yawRightButton = screen.getByText("▶");
+    await userEvent.click(yawRightButton);
+    expect(consoleSpy).toHaveBeenCalledWith("Button clicked: yawRight");
   });
 });

@@ -1,0 +1,22 @@
+.game-controls {
+  padding: 1rem;
+  color: white;
+}
+
+.game-controls h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.5rem;
+}
+
+.game-controls p {
+  margin: 0.5rem 0;
+}
+
+.controls-section {
+  margin: 1rem 0;
+}
+
+.controls-section h4 {
+  margin-bottom: 0.5rem;
+  color: #ccc;
+}
