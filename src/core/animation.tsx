@@ -1,7 +1,9 @@
+import React from "react";
 import * as THREE from "three";
 import { Character } from "../character";
 import { gameInstance } from "./gameInstance";
-import { checkBillboardInteractions, billboards } from "../billboard";
+import { checkBillboardInteractions } from "../scene/billboard";
+import { Billboard } from "../scene/billboard";
 
 let obstacles: THREE.Object3D[] = [];
 
@@ -51,8 +53,13 @@ function animationLoop(): void {
   gameInstance.character.update(obstacles);
   gameInstance.character.updateCamera(gameInstance.camera);
 
-  // Add this line to check for billboard interactions
-  checkBillboardInteractions(gameInstance.character.mesh.position);
+  // Check for billboard interactions if billboards are available
+  if (billboards && billboards.length > 0) {
+    checkBillboardInteractions(
+      gameInstance.character.mesh.position,
+      billboards
+    );
+  }
 
   gameInstance.renderer.render(gameInstance.scene, gameInstance.camera);
 }
@@ -64,6 +71,36 @@ export function stopAnimation(): void {
     console.log("Animation stopped");
   }
 }
+
+interface AnimationProps {
+  scene: THREE.Scene;
+  renderer: THREE.WebGLRenderer;
+  character: Character | THREE.Mesh;
+  camera: THREE.Camera;
+  billboards?: Billboard[];
+}
+
+// Add billboards as a module-level variable
+let billboards: Billboard[] | undefined;
+
+export const Animation: React.FC<AnimationProps> = ({
+  scene,
+  renderer,
+  character,
+  camera,
+  billboards: propBillboards,
+}) => {
+  React.useEffect(() => {
+    billboards = propBillboards; // Store billboards for animation loop
+    startAnimation(scene, renderer, character, camera);
+    return () => {
+      stopAnimation();
+      billboards = undefined;
+    };
+  }, [scene, renderer, character, camera, propBillboards]);
+
+  return null;
+};
 
 export function startAnimation(
   parScene: THREE.Scene,
@@ -92,3 +129,5 @@ export function startAnimation(
   console.log("Animation started");
   animationLoop();
 }
+
+export default Animation;
