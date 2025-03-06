@@ -1,3 +1,4 @@
+import React from "react";
 import * as THREE from "three";
 import { gameInstance } from "../core/gameInstance";
 
@@ -17,7 +18,6 @@ export function setScene(): {
   const galaxyTexture = textureLoader.load("src/assets/starfield.svg");
 
   // Set the texture as the scene background
-  // This is much simpler than creating a sphere
   scene.background = galaxyTexture;
 
   const camera = new THREE.PerspectiveCamera(
@@ -91,6 +91,8 @@ export function setWindowResize(
     const currentCamera = gameInstance.camera || camera;
     const currentRenderer = gameInstance.renderer || renderer;
 
+    console.log(`current camera: ${currentCamera}`);
+    console.log(`type of current camera: ${typeof currentCamera}`);
     if (currentCamera && currentCamera instanceof THREE.PerspectiveCamera) {
       currentCamera.aspect = window.innerWidth / window.innerHeight;
       currentCamera.updateProjectionMatrix();
@@ -105,3 +107,10 @@ export function setWindowResize(
   globalResizeHandler = resizeHandler;
   window.addEventListener("resize", resizeHandler);
 }
+
+// Optional: Add a React component for managing the canvas
+export const GameCanvas: React.FC = () => {
+  return <canvas id="gameCanvas" />;
+};
+
+export default GameCanvas;
