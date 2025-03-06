@@ -97,7 +97,8 @@ Logic that operates on entities with specific components.
       EntityManager.ts   // Manages entity lifecycle
       ComponentManager.ts // Manages component registration
     /engine
-      Game.ts           // Main game loop
+      Game.tsx          // Main game loop and React entry point
+      GameLoop.ts
       Time.ts           // Game time management
       Input.ts          // Input management
       Scene.ts          // Scene management

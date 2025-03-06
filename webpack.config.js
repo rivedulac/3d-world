@@ -5,18 +5,18 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 module.exports = {
   entry: "./src/game.ts",
   mode: "development",
-  devtool: "source-map", // Add source maps for better debugging
+  devtool: "source-map",
   module: {
     rules: [
       {
-        test: /\.tsx?$/,
+        test: /\.(ts|tsx)$/,
         use: "ts-loader",
         exclude: /node_modules/,
       },
     ],
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js"],
+    extensions: [".tsx", ".ts", ".js", ".jsx"],
     // Complete solution for Three.js deduplications
     alias: {
       three: path.resolve(__dirname, "node_modules/three"),
@@ -72,9 +72,16 @@ module.exports = {
           chunks: "all",
           priority: 20,
         },
+        // Bundle React into a separate chunk
+        react: {
+          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+          name: "react",
+          chunks: "all",
+          priority: 15,
+        },
         // Bundle other common vendors
         vendors: {
-          test: /[\\/]node_modules[\\/](?!three[\\/])/,
+          test: /[\\/]node_modules[\\/](?!(three|react|react-dom)[\\/])/,
           name: "vendors",
           chunks: "all",
           priority: 10,
