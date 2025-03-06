@@ -12,25 +12,28 @@ interface CharacterProps {
 }
 
 export class Character extends React.Component<CharacterProps> {
-  private mesh: THREE.Mesh;
-  private velocity: THREE.Vector3;
-  private collider: THREE.Box3;
+  public rotationSpeed: number = ROTATION_SPEED;
+  public pitchSpeed: number = PITCH_SPEED;
+  public movementSpeed: number = MOVEMENT_SPEED;
+  public keyControlsSetup: boolean = false;
+  public setupControls: () => void = this.componentDidMount.bind(this);
+  public mesh: THREE.Mesh;
+  public velocity: THREE.Vector3;
+  public collider: THREE.Box3;
 
   // Movement controls
-  private moveForward: boolean = false;
-  private moveBackward: boolean = false;
+  public moveForward: boolean = false;
+  public moveBackward: boolean = false;
   // Rotation controls
-  private yawLeft: boolean = false;
-  private yawRight: boolean = false;
-  private pitchUp: boolean = false;
-  private pitchDown: boolean = false;
+  public yawLeft: boolean = false;
+  public yawRight: boolean = false;
+  public pitchUp: boolean = false;
+  public pitchDown: boolean = false;
   // Max pitch angles in radians
-  private maxPitchUp: number = Math.PI / 4; // 45 degrees up
-  private maxPitchDown: number = -Math.PI / 6; // 30 degrees down
+  public maxPitchUp: number = Math.PI / 4; // 45 degrees up
+  public maxPitchDown: number = -Math.PI / 6; // 30 degrees down
   // Current pitch angle
-  private currentPitch: number = 0;
-
-  private setupKeyControls: boolean = false;
+  public currentPitch: number = 0;
 
   constructor(props: CharacterProps) {
     super(props);
@@ -58,7 +61,7 @@ export class Character extends React.Component<CharacterProps> {
   }
 
   componentDidMount(): void {
-    if (this.setupKeyControls) {
+    if (this.keyControlsSetup) {
       console.log("Key controls already set up, skipping...");
       return;
     }
@@ -66,7 +69,7 @@ export class Character extends React.Component<CharacterProps> {
     document.addEventListener("keydown", this.onKeyDown);
     document.addEventListener("keyup", this.onKeyUp);
 
-    this.setupKeyControls = true;
+    this.keyControlsSetup = true;
     console.log("Character controls set up");
   }
 
@@ -76,7 +79,7 @@ export class Character extends React.Component<CharacterProps> {
     document.removeEventListener("keyup", this.onKeyUp);
   }
 
-  private onKeyDown = (event: KeyboardEvent): void => {
+  public onKeyDown = (event: KeyboardEvent): void => {
     switch (event.code) {
       case "KeyW":
         this.moveForward = true;
@@ -99,7 +102,7 @@ export class Character extends React.Component<CharacterProps> {
     }
   };
 
-  private onKeyUp = (event: KeyboardEvent): void => {
+  public onKeyUp = (event: KeyboardEvent): void => {
     switch (event.code) {
       case "KeyW":
         this.moveForward = false;
@@ -122,44 +125,44 @@ export class Character extends React.Component<CharacterProps> {
     }
   };
 
-  private handleRotation(): void {
+  public handleRotation(): void {
     // Handle yaw rotation (left/right)
     if (this.yawLeft) {
-      this.mesh.rotation.y += ROTATION_SPEED;
+      this.mesh.rotation.y += this.rotationSpeed;
     }
     if (this.yawRight) {
-      this.mesh.rotation.y -= ROTATION_SPEED;
+      this.mesh.rotation.y -= this.rotationSpeed;
     }
 
     // Handle pitch rotation (up/down) with limits
     if (this.pitchUp) {
-      this.currentPitch += PITCH_SPEED;
+      this.currentPitch += this.pitchSpeed;
       if (this.currentPitch > this.maxPitchUp) {
         this.currentPitch = this.maxPitchUp;
       }
     }
     if (this.pitchDown) {
-      this.currentPitch -= PITCH_SPEED;
+      this.currentPitch -= this.pitchSpeed;
       if (this.currentPitch < this.maxPitchDown) {
         this.currentPitch = this.maxPitchDown;
       }
     }
   }
 
-  private calculateVelocity(): void {
+  public calculateVelocity(): void {
     this.velocity.set(0, 0, 0);
 
     if (this.moveForward) {
-      this.velocity.x = Math.sin(this.mesh.rotation.y) * MOVEMENT_SPEED;
-      this.velocity.z = Math.cos(this.mesh.rotation.y) * MOVEMENT_SPEED;
+      this.velocity.x = Math.sin(this.mesh.rotation.y) * this.movementSpeed;
+      this.velocity.z = Math.cos(this.mesh.rotation.y) * this.movementSpeed;
     }
     if (this.moveBackward) {
-      this.velocity.x = -Math.sin(this.mesh.rotation.y) * MOVEMENT_SPEED;
-      this.velocity.z = -Math.cos(this.mesh.rotation.y) * MOVEMENT_SPEED;
+      this.velocity.x = -Math.sin(this.mesh.rotation.y) * this.movementSpeed;
+      this.velocity.z = -Math.cos(this.mesh.rotation.y) * this.movementSpeed;
     }
   }
 
-  private handleMovement(obstacles: THREE.Object3D[]): void {
+  public handleMovement(obstacles: THREE.Object3D[]): void {
     if (this.velocity.lengthSq() > 0) {
       const originalPosition = this.mesh.position.clone();
 
@@ -184,7 +187,7 @@ export class Character extends React.Component<CharacterProps> {
     checkNPCInteractions(this.mesh.position);
   }
 
-  private isOutOfBounds(): boolean {
+  public isOutOfBounds(): boolean {
     const floorSize = 50;
     const halfFloorSize = floorSize / 2;
     const margin = 0.5; // Half the width of the character
@@ -199,7 +202,7 @@ export class Character extends React.Component<CharacterProps> {
     return false;
   }
 
-  private checkCollisions(obstacles: THREE.Object3D[]): boolean {
+  public checkCollisions(obstacles: THREE.Object3D[]): boolean {
     for (const obstacle of obstacles) {
       if (!(obstacle instanceof THREE.Mesh)) continue;
 
