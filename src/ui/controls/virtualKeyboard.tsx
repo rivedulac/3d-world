@@ -1,25 +1,40 @@
 import React, { useState } from "react";
-// import { Character } from "../../character";
+import { Character } from "../../entities/character";
 import CircularButton from "../buttons/circularButton";
 import KeyboardButton from "../buttons/keyboardButton";
 import "./VirtualKeyboard.css";
 
 interface VirtualKeyboardProps {
-  //   character: Character | null;
+  character: Character | null;
 }
 
-export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = (
-  {
-    //   character, // TODO: Use the character to handl/e the button click
-  }
-) => {
+export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = ({
+  character,
+}) => {
   const [isVisible, setIsVisible] = useState(
     () => "ontouchstart" in window || navigator.maxTouchPoints > 0
   );
 
-  const handleClick = (direction: string) => {
-    // TODO: Implement the logic to handle the button click
-    console.log(`Button clicked: ${direction}`);
+  const handlePress = (keyCode: string) => {
+    if (!character) return;
+
+    const keyDownEvent = new KeyboardEvent("keydown", {
+      code: keyCode,
+      bubbles: true,
+    });
+
+    document.dispatchEvent(keyDownEvent);
+  };
+
+  const handleRelease = (keyCode: string) => {
+    if (!character) return;
+
+    const keyUpEvent = new KeyboardEvent("keyup", {
+      code: keyCode,
+      bubbles: true,
+    });
+
+    document.dispatchEvent(keyUpEvent);
   };
 
   return (
@@ -32,12 +47,20 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = (
             <div className="move-button-group">
               <CircularButton
                 icon="W"
-                onClick={() => handleClick("forward")}
+                onTouchStart={() => handlePress("KeyW")}
+                onTouchEnd={() => handleRelease("KeyW")}
+                onMouseDown={() => handlePress("KeyW")}
+                onMouseUp={() => handleRelease("KeyW")}
+                onMouseLeave={() => handleRelease("KeyW")}
                 className="vk-forward"
               />
               <CircularButton
                 icon="S"
-                onClick={() => handleClick("backward")}
+                onTouchStart={() => handlePress("KeyS")}
+                onTouchEnd={() => handleRelease("KeyS")}
+                onMouseDown={() => handlePress("KeyS")}
+                onMouseUp={() => handleRelease("KeyS")}
+                onMouseLeave={() => handleRelease("KeyS")}
                 className="vk-backward"
               />
             </div>
@@ -48,24 +71,40 @@ export const VirtualKeyboard: React.FC<VirtualKeyboardProps> = (
             <div className="pitch-button-group">
               <CircularButton
                 icon="▲"
-                onClick={() => handleClick("pitchUp")}
+                onTouchStart={() => handlePress("ArrowUp")}
+                onTouchEnd={() => handleRelease("ArrowUp")}
+                onMouseDown={() => handlePress("ArrowUp")}
+                onMouseUp={() => handleRelease("ArrowUp")}
+                onMouseLeave={() => handleRelease("ArrowUp")}
                 className="vk-pitchUp"
               />
               <CircularButton
                 icon="▼"
-                onClick={() => handleClick("pitchDown")}
+                onTouchStart={() => handlePress("ArrowDown")}
+                onTouchEnd={() => handleRelease("ArrowDown")}
+                onMouseDown={() => handlePress("ArrowDown")}
+                onMouseUp={() => handleRelease("ArrowDown")}
+                onMouseLeave={() => handleRelease("ArrowDown")}
                 className="vk-pitchDown"
               />
             </div>
             <div className="yaw-button-group">
               <CircularButton
                 icon="◀"
-                onClick={() => handleClick("yawLeft")}
+                onTouchStart={() => handlePress("ArrowLeft")}
+                onTouchEnd={() => handleRelease("ArrowLeft")}
+                onMouseDown={() => handlePress("ArrowLeft")}
+                onMouseUp={() => handleRelease("ArrowLeft")}
+                onMouseLeave={() => handleRelease("ArrowLeft")}
                 className="vk-yawLeft"
               />
               <CircularButton
                 icon="▶"
-                onClick={() => handleClick("yawRight")}
+                onTouchStart={() => handlePress("ArrowRight")}
+                onTouchEnd={() => handleRelease("ArrowRight")}
+                onMouseDown={() => handlePress("ArrowRight")}
+                onMouseUp={() => handleRelease("ArrowRight")}
+                onMouseLeave={() => handleRelease("ArrowRight")}
                 className="vk-yawRight"
               />
             </div>

@@ -14,7 +14,7 @@ export interface CircularButtonProps {
   id?: string;
 
   // Function to call when the button is clicked
-  onClick: () => void;
+  onClick?: () => void;
 
   // CSS class to add to the button
   className?: string;
@@ -27,6 +27,15 @@ export interface CircularButtonProps {
 
   // ARIA label for accessibility
   ariaLabel?: string;
+
+  // Touch event handlers
+  onTouchStart?: () => void;
+  onTouchEnd?: () => void;
+
+  // Mouse event handlers
+  onMouseDown?: () => void;
+  onMouseUp?: () => void;
+  onMouseLeave?: () => void;
 }
 
 // A reusable circular button component for UI controls
@@ -38,6 +47,11 @@ const CircularButton: React.FC<CircularButtonProps> = ({
   position,
   isActive = false,
   ariaLabel,
+  onTouchStart,
+  onTouchEnd,
+  onMouseDown,
+  onMouseUp,
+  onMouseLeave,
 }) => {
   useEffect(() => {
     console.log(`Circular button created: ${id || ""}`);
@@ -60,6 +74,11 @@ const CircularButton: React.FC<CircularButtonProps> = ({
       id={id}
       className={buttonClassNames}
       onClick={onClick}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
+      onMouseLeave={onMouseLeave}
       aria-label={ariaLabel}
       type="button"
     >

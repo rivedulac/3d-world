@@ -4,104 +4,151 @@ import "@testing-library/jest-dom";
 import CircularButton from "../circularButton";
 
 describe("CircularButton", () => {
+  const mockOnClick = jest.fn();
+  const mockOnTouchStart = jest.fn();
+  const mockOnTouchEnd = jest.fn();
+  const mockOnMouseDown = jest.fn();
+  const mockOnMouseUp = jest.fn();
+  const mockOnMouseLeave = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
   // Basic rendering
   test("renders with the provided icon", () => {
-    const handleClick = jest.fn();
-    render(<CircularButton icon="🔍" onClick={handleClick} />);
-
+    render(<CircularButton icon="🔄" ariaLabel="Refresh" />);
     const button = screen.getByRole("button");
-    expect(button).toHaveTextContent("🔍");
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveTextContent("🔄");
+    expect(button).toHaveAttribute("aria-label", "Refresh");
   });
 
   // ID assignment
   test("assigns the provided ID to the button", () => {
-    const handleClick = jest.fn();
-    render(<CircularButton id="test-button" icon="📋" onClick={handleClick} />);
-
+    render(<CircularButton id="test-button" icon="📋" />);
     const button = screen.getByRole("button");
     expect(button).toHaveAttribute("id", "test-button");
   });
 
   // Click handling
   test("calls the onClick handler when clicked", () => {
-    const handleClick = jest.fn();
-    render(<CircularButton icon="📢" onClick={handleClick} />);
-
+    render(<CircularButton icon="🔄" onClick={mockOnClick} />);
     const button = screen.getByRole("button");
     fireEvent.click(button);
-
-    expect(handleClick).toHaveBeenCalledTimes(1);
+    expect(mockOnClick).toHaveBeenCalledTimes(1);
   });
 
   // Position classes
   test("applies the correct position class", () => {
-    const handleClick = jest.fn();
     render(
-      <CircularButton icon="⚙️" onClick={handleClick} position="bottom-right" />
+      <CircularButton
+        icon="🔄"
+        position="bottom-right"
+        isActive={true}
+        className="custom-class"
+      />
     );
-
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("bottom-right");
+    expect(button).toHaveClass(
+      "circularButton",
+      "bottom-right",
+      "active",
+      "custom-class"
+    );
   });
 
   // Active state
   test("applies the active class when isActive is true", () => {
-    const handleClick = jest.fn();
-    render(<CircularButton icon="🔔" onClick={handleClick} isActive={true} />);
-
+    render(<CircularButton icon="🔄" isActive={true} />);
     const button = screen.getByRole("button");
     expect(button).toHaveClass("active");
   });
 
   // Custom className
   test("includes custom className when provided", () => {
-    const handleClick = jest.fn();
-    render(
-      <CircularButton
-        icon="💬"
-        onClick={handleClick}
-        className="custom-class"
-      />
-    );
-
+    render(<CircularButton icon="🔄" className="custom-class" />);
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("custom-class");
-    // Should also have the base class
-    expect(button).toHaveClass("circularButton");
+    expect(button).toHaveClass("circularButton", "custom-class");
   });
 
   // Accessibility
   test("sets the aria-label attribute correctly", () => {
-    const handleClick = jest.fn();
-    render(
-      <CircularButton
-        icon="🔍"
-        onClick={handleClick}
-        ariaLabel="Search button"
-      />
-    );
-
+    render(<CircularButton icon="🔄" ariaLabel="Refresh" />);
     const button = screen.getByRole("button");
-    expect(button).toHaveAttribute("aria-label", "Search button");
+    expect(button).toHaveAttribute("aria-label", "Refresh");
   });
 
   // Combining multiple props
   test("combines all classes correctly", () => {
-    const handleClick = jest.fn();
     render(
       <CircularButton
         icon="📱"
-        onClick={handleClick}
-        className="test-class"
         position="bottom-right-secondary"
         isActive={true}
+        className="test-class"
       />
     );
-
     const button = screen.getByRole("button");
-    expect(button).toHaveClass("circularButton");
-    expect(button).toHaveClass("bottom-right-secondary");
-    expect(button).toHaveClass("active");
-    expect(button).toHaveClass("test-class");
+    expect(button).toHaveClass(
+      "circularButton",
+      "bottom-right-secondary",
+      "active",
+      "test-class"
+    );
+  });
+
+  it("handles touch events", () => {
+    render(
+      <CircularButton
+        icon="🔄"
+        onTouchStart={mockOnTouchStart}
+        onTouchEnd={mockOnTouchEnd}
+      />
+    );
+    const button = screen.getByRole("button");
+
+    fireEvent.touchStart(button);
+    expect(mockOnTouchStart).toHaveBeenCalledTimes(1);
+
+    fireEvent.touchEnd(button);
+    expect(mockOnTouchEnd).toHaveBeenCalledTimes(1);
+  });
+
+  it("handles mouse events", () => {
+    render(
+      <CircularButton
+        icon="🔄"
+        onMouseDown={mockOnMouseDown}
+        onMouseUp={mockOnMouseUp}
+        onMouseLeave={mockOnMouseLeave}
+      />
+    );
+    const button = screen.getByRole("button");
+
+    fireEvent.mouseDown(button);
+    expect(mockOnMouseDown).toHaveBeenCalledTimes(1);
+
+    fireEvent.mouseUp(button);
+    expect(mockOnMouseUp).toHaveBeenCalledTimes(1);
+
+    fireEvent.mouseLeave(button);
+    expect(mockOnMouseLeave).toHaveBeenCalledTimes(1);
+  });
+
+  it("logs creation message with ID", () => {
+    const consoleSpy = jest.spyOn(console, "log");
+    render(<CircularButton icon="🔄" id="test-button" />);
+    expect(consoleSpy).toHaveBeenCalledWith(
+      "Circular button created: test-button"
+    );
+    consoleSpy.mockRestore();
+  });
+
+  it("logs creation message without ID", () => {
+    const consoleSpy = jest.spyOn(console, "log");
+    render(<CircularButton icon="🔄" />);
+    expect(consoleSpy).toHaveBeenCalledWith("Circular button created: ");
+    consoleSpy.mockRestore();
   });
 });
