@@ -12,3 +12,6 @@ dist/
 
 # Datastore
 *.DS_Store
+
+# Test artifacts
+coverage/
