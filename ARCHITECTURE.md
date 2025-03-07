@@ -1,7 +1,7 @@
 # Game Architecture
 
 ## Overview
-
+![Entity-Component-System Architecture](./screenshots/ecs.png)
 This document outlines the Component-Entity-System (CES) architecture for our 3D game engine.
 Please keep in mind that this is what we aim for, not what we have at the moment as of Mar 6 2025.
 
@@ -87,87 +87,140 @@ Logic that operates on entities with specific components.
 
 ```typescript
 /src
-  /core                  // Core game engine functionality
-    /ecs                 // Entity-Component-System core
-      Entity.ts          // Base entity class
-      Component.ts       // Base component class
-      System.ts         // Base system class
-      World.ts          // Game world container
-      SystemManager.ts   // Manages system execution
-      EntityManager.ts   // Manages entity lifecycle
-      ComponentManager.ts // Manages component registration
+  /core
+    /ecs
+      types.ts              // Core ECS type definitions
+      componentFactory.ts   // Component creation utilities
+      entityManager.ts      // Entity management
+      systemManager.ts      // System management
+      world.ts              // Game world state
     /engine
-      Game.tsx          // Main game loop and React entry point
-      GameLoop.ts
-      Time.ts           // Game time management
-      Input.ts          // Input management
-      Scene.ts          // Scene management
+      Game.tsx              // React entry point
+      GameLoop.ts           // Main game loop
+      Time.ts               // Time management
+      Scene.ts              // Three.js scene management
+      Camera.ts             // Camera controls and management
+      Input.ts              // Input handling (keyboard, mouse, touch)
 
-  /components           // Game components
+  /components
     /physics
-      TransformComponent.ts
-      ColliderComponent.ts
-      VelocityComponent.ts
-    /rendering
-      MeshComponent.ts
-      MaterialComponent.ts
-      CameraComponent.ts
-    /input
-      KeyboardComponent.ts
-      TouchComponent.ts
-    /behavior
-      MovementComponent.ts
-      InteractionComponent.ts
-      AIComponent.ts
+      transform.ts          // Position, rotation, scale
+      collider.ts           // Collision detection
+      velocity.ts           // Movement properties
+    /character
+      player.ts             // Player-specific properties
+      npc.ts                // NPC-specific properties
+      animation.ts          // Character animations
+    /interaction
+      interactable.ts       // Interactive object properties
+      dialogue.ts           // Conversation system properties
+      trigger.ts            // Interaction trigger zones
+    /ui
+      billboard.ts          // Portfolio billboard properties
+      hud.ts                // HUD elements
+      virtualKeyboard.ts    // Mobile controls
 
-  /systems              // Game systems
+  /systems
     /physics
-      MovementSystem.ts
-      CollisionSystem.ts
-    /rendering
-      RenderSystem.ts
-      AnimationSystem.ts
-    /input
-      InputSystem.ts
-    /behavior
-      AISystem.ts
-      InteractionSystem.ts
+      movement.ts           // Character movement
+      collision.ts          // Collision handling
+    /character
+      playerControl.ts      // Player input handling
+      npcBehavior.ts        // NPC behavior and pathfinding
+      animation.ts          // Animation management
+    /interaction
+      dialogue.ts           // Dialogue system
+      trigger.ts            // Interaction detection
+    /ui
+      billboardUpdate.ts    // Portfolio content management
+      hudUpdate.ts          // HUD updates
+      virtualKeyboard.ts    // Mobile input processing
 
-  /entities             // Game entities
-    /prefabs            // Pre-configured entity templates
-      Character.ts
-      NPC.ts
-      Billboard.ts
-    /factory            // Entity creation factories
-      EntityFactory.ts
-
-  /ui                   // React UI components
+  /ui                       // React UI Components
     /components
-      VirtualKeyboard.tsx
-      GameHUD.tsx
-      MessageSystem.tsx
+      DialogueBox.tsx       // Conversation interface
+      Portfolio.tsx         // Portfolio content display
+      VirtualKeyboard.tsx   // Mobile controls
+      GameHUD.tsx           // Game interface elements
     /controls
-      Button.tsx
-      Joystick.tsx
+      Button.tsx            // Reusable button component
+      Joystick.tsx          // Mobile movement control
+    /theme                  // UI styling and theming
+      colors.ts             // Color palette
+      typography.ts         // Text styling
+      animations.ts         // UI animations
 
-  /utils               // Utility functions and helpers
-    Math.ts
-    Debug.ts
-    EventEmitter.ts
+  /data
+    /dialogue               // Pre-scripted conversations
+      introNPC.json
+      portfolioNPC.json
+      skillsNPC.json
+    /portfolio              // Portfolio content
+      resume.json
+      projects.json
+      skills.json
+    /world                  // World configuration
+      objects.json          // Static object placement
+      npcs.json             // NPC placement and properties
 
-  /config             // Game configuration
-    GameConfig.ts
-    SystemConfig.ts
-    EntityConfig.ts
+  /assets
+    /models                 // 3D models
+      /characters
+        player.glb
+        npc.glb
+      /environment
+        planet.glb
+        trees.glb
+    /textures               // Textures and materials
+    /animations             // Character animations
+    /sounds                 // Sound effects and music
+    /placeholders           // Placeholder assets for development
 
-  /assets             // Asset management
-    AssetLoader.ts
-    AssetManager.ts
+  /utils
+    math.ts                 // Math utilities
+    debug.ts                // Debugging utilities
+    events.ts               // Event system
 
-  /types              // TypeScript type definitions
-    GameTypes.ts
-    ComponentTypes.ts
-    SystemTypes.ts
+  /services                 // Service-oriented functionality
+    assetLoader.ts          // Centralized asset loading
+    persistenceService.ts   // Save/load game state
+    analyticsService.ts     // Usage tracking (optional)
+    audioService.ts         // Sound management
+
+  /repositories             // Data access layer
+    dialogueRepository.ts   // Loading dialogue data
+    portfolioRepository.ts  // Loading portfolio content
+    worldRepository.ts      // Loading world configuration
+
+  /config                   // Game configuration
+    game.ts                 // General game settings
+    physics.ts              // Physics settings
+    graphics.ts             // Graphics settings
+    audio.ts                // Audio settings
+    constants.ts            // Game constants
+
+  /state                    // Game state management
+    gameState.ts            // Global game state
+    persistentState.ts      // Saved game state
+    contextState.ts         // Conversation context
+
+  /ai                       // Future NLP integration
+    /dialogue
+      nlpProcessor.ts       // Natural language processing
+      responseGen.ts        // Response generation
+      contextManager.ts     // Conversation context tracking
+
+  /types                    // TypeScript type definitions
+    game.d.ts
+    components.d.ts
+    systems.d.ts
+    services.d.ts
+    repositories.d.ts
+
+  /hooks                    // Custom React hooks
+    useGameInput.ts         // Input handling
+    useGameState.ts         // Game state access
+    useAssets.ts            // Asset loading
 ```
 
 ### Key Directories
