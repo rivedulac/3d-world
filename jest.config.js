@@ -15,6 +15,7 @@ module.exports = {
   transform: {
     "^.+\\.(ts|tsx)$": ["ts-jest", { tsconfig: "tsconfig.jest.json" }],
   },
+  transformIgnorePatterns: ["/node_modules/(?!(uuid)/)"],
   testMatch: [
     "**/__tests__/**/*.test.[jt]s?(x)",
     "**/?(*.)+(spec|test).[jt]s?(x)",
@@ -27,4 +28,6 @@ module.exports = {
     "!src/index.tsx",
     "!src/**/*.stories.{ts,tsx}",
   ],
+  preset: "ts-jest",
+  testEnvironment: "node",
 };
