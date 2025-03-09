@@ -12,6 +12,7 @@ import {
   EventListener,
   GameTime,
 } from "./types";
+import { DEFAULT_POSITIONS, ENTITY_TAGS, EVENTS } from "../../config/constants";
 
 /**
  * Implementation of the World interface.
@@ -51,7 +52,7 @@ export class GameWorld implements World, EventEmitter {
 
     // Emit entity created event
     this.emit({
-      type: "entity:created",
+      type: EVENTS.ENTITY_CREATED,
       entityId: entityId,
     });
 
@@ -71,7 +72,7 @@ export class GameWorld implements World, EventEmitter {
     // Remove all components
     entity.components.forEach((component) => {
       this.emit({
-        type: "component:removed",
+        type: EVENTS.COMPONENT_REMOVED,
         entityId: entityId,
         componentType: component.type,
       });
@@ -83,7 +84,7 @@ export class GameWorld implements World, EventEmitter {
     // Emit entity removed event
     if (result) {
       this.emit({
-        type: "entity:removed",
+        type: EVENTS.ENTITY_REMOVED,
         entityId: entityId,
       });
     }
@@ -109,7 +110,7 @@ export class GameWorld implements World, EventEmitter {
 
     // Emit component added event
     this.emit({
-      type: "component:added",
+      type: EVENTS.COMPONENT_ADDED,
       entityId: entityId,
       componentType: component.type,
     });
@@ -136,7 +137,7 @@ export class GameWorld implements World, EventEmitter {
     // Emit component removed event
     if (result) {
       this.emit({
-        type: "component:removed",
+        type: EVENTS.COMPONENT_REMOVED,
         entityId: entityId,
         componentType: componentType,
       });
@@ -179,7 +180,7 @@ export class GameWorld implements World, EventEmitter {
 
     // Emit system added event
     this.emit({
-      type: "system:added",
+      type: EVENTS.SYSTEM_ADDED,
       system: system,
     });
   }
@@ -204,7 +205,7 @@ export class GameWorld implements World, EventEmitter {
 
     // Emit system removed event
     this.emit({
-      type: "system:removed",
+      type: EVENTS.SYSTEM_REMOVED,
       system: system,
     });
 
@@ -345,44 +346,43 @@ export class GameWorld implements World, EventEmitter {
 
     // Emit world initialized event
     this.emit({
-      type: "world:initialized",
+      type: EVENTS.WORLD_INITIALIZED,
     });
   }
 
   /**
-   * Creates the skybox using assets/starfield.svg
+   * Creates the skybox using starfield image
    */
   private createSkybox(): void {
     // Create skybox entity
     const skyboxEntity = this.createEntity();
 
     // Add skybox tag
-    skyboxEntity.tags.add("skybox");
+    skyboxEntity.tags.add(ENTITY_TAGS.SKYBOX);
 
-    // Here you would add the necessary components for a skybox
-    // This depends on your rendering system, but you'd typically need
+    // TODO: add the necessary components for a skybox
     // a transform component and a mesh/material component
     // Example (pseudo-code):
     // this.addComponent(skyboxEntity.id, new TransformComponent());
-    // this.addComponent(skyboxEntity.id, new MeshComponent('assets/starfield.svg'));
+    // this.addComponent(skyboxEntity.id, new MeshComponent(ASSETS.SKYBOX));
 
     console.log("Skybox created with entity ID:", skyboxEntity.id);
   }
 
   /**
-   * Creates the planet floor using assets/silver_floor.svg
+   * Creates the planet floor using silver floor image
    */
   private createPlanet(): void {
     // Create planet entity
     const planetEntity = this.createEntity();
 
     // Add planet tag
-    planetEntity.tags.add("planet");
+    planetEntity.tags.add(ENTITY_TAGS.PLANET);
 
-    // Here you would add the necessary components for the planet
+    // TODO: add the necessary components for the planet
     // Example (pseudo-code):
     // this.addComponent(planetEntity.id, new TransformComponent());
-    // this.addComponent(planetEntity.id, new MeshComponent('assets/silver_floor.svg'));
+    // this.addComponent(planetEntity.id, new MeshComponent(ASSETS.PLANET));
     // this.addComponent(planetEntity.id, new ColliderComponent('floor'));
 
     console.log("Planet created with entity ID:", planetEntity.id);
@@ -391,11 +391,11 @@ export class GameWorld implements World, EventEmitter {
   /**
    * Creates a default player entity
    */
-  public createPlayerEntity(position = { x: 0, y: 0, z: 0 }): Entity {
+  public createPlayerEntity(position = DEFAULT_POSITIONS.PLAYER): Entity {
     const playerEntity = this.createEntity();
 
     // Add player tag
-    playerEntity.tags.add("player");
+    playerEntity.tags.add(ENTITY_TAGS.PLAYER);
 
     // Here you would add player components
     // Example (pseudo-code):
@@ -413,13 +413,13 @@ export class GameWorld implements World, EventEmitter {
    * Creates an NPC entity
    */
   public createNPCEntity(
-    position = { x: 0, y: 0, z: 0 },
+    position = DEFAULT_POSITIONS.NPC,
     dialogueKey: string
   ): Entity {
     const npcEntity = this.createEntity();
 
     // Add NPC tag
-    npcEntity.tags.add("npc");
+    npcEntity.tags.add(ENTITY_TAGS.NPC);
 
     // Here you would add NPC components
     // Example (pseudo-code):
@@ -435,11 +435,11 @@ export class GameWorld implements World, EventEmitter {
   /**
    * Creates a billboard entity for displaying portfolio information
    */
-  public createBillboardEntity(position = { x: 0, y: 2, z: -5 }): Entity {
+  public createBillboardEntity(position = DEFAULT_POSITIONS.BILLBOARD): Entity {
     const billboardEntity = this.createEntity();
 
     // Add billboard tag
-    billboardEntity.tags.add("billboard");
+    billboardEntity.tags.add(ENTITY_TAGS.BILLBOARD);
 
     // Here you would add billboard components
     // Example (pseudo-code):

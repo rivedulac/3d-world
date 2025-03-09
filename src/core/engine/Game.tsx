@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { GameLoop } from "./GameLoop";
+import { GAME_CANVAS_ID } from "../../config/constants";
 
 declare const module: {
   hot?: {
@@ -39,7 +40,7 @@ const Game: React.FC = () => {
 };
 
 // Initialize React app
-const container = document.getElementById("gameCanvas");
+const container = document.getElementById(GAME_CANVAS_ID);
 if (!container) {
   console.error("Game container not found");
 } else {

@@ -6,6 +6,7 @@ import {
   Entity,
   System,
 } from "../types";
+import { EVENTS, ENTITY_TAGS } from "../../../config/constants";
 
 // Mock component for testing without needing componentFactory
 class MockComponent implements Component {
@@ -254,12 +255,12 @@ describe("GameWorld", () => {
 
     test("should query entities with specific tags", () => {
       const entity1 = world.createEntity();
-      entity1.tags.add("player");
+      entity1.tags.add(ENTITY_TAGS.PLAYER);
 
       const entity2 = world.createEntity();
       entity2.tags.add("enemy");
 
-      const result = world.queryEntities({ tags: ["player"] });
+      const result = world.queryEntities({ tags: [ENTITY_TAGS.PLAYER] });
 
       expect(result.length).toBe(1);
       expect(result[0]).toBe(entity1);
@@ -308,12 +309,12 @@ describe("GameWorld", () => {
 
     test("should emit entity created event", () => {
       const listener = jest.fn();
-      world.on("entity:created", listener);
+      world.on(EVENTS.ENTITY_CREATED, listener);
 
       const entity = world.createEntity();
 
       expect(listener).toHaveBeenCalledWith({
-        type: "entity:created",
+        type: EVENTS.ENTITY_CREATED,
         entityId: entity.id,
       });
     });
@@ -322,12 +323,12 @@ describe("GameWorld", () => {
       const entity = world.createEntity();
 
       const listener = jest.fn();
-      world.on("entity:removed", listener);
+      world.on(EVENTS.ENTITY_REMOVED, listener);
 
       world.removeEntity(entity.id);
 
       expect(listener).toHaveBeenCalledWith({
-        type: "entity:removed",
+        type: EVENTS.ENTITY_REMOVED,
         entityId: entity.id,
       });
     });
@@ -337,12 +338,12 @@ describe("GameWorld", () => {
       const component = new MockComponent(ComponentType.TRANSFORM, entity.id);
 
       const listener = jest.fn();
-      world.on("component:added", listener);
+      world.on(EVENTS.COMPONENT_ADDED, listener);
 
       world.addComponent(entity.id, component);
 
       expect(listener).toHaveBeenCalledWith({
-        type: "component:added",
+        type: EVENTS.COMPONENT_ADDED,
         entityId: entity.id,
         componentType: ComponentType.TRANSFORM,
       });
@@ -354,12 +355,12 @@ describe("GameWorld", () => {
       world.addComponent(entity.id, component);
 
       const listener = jest.fn();
-      world.on("component:removed", listener);
+      world.on(EVENTS.COMPONENT_REMOVED, listener);
 
       world.removeComponent(entity.id, ComponentType.TRANSFORM);
 
       expect(listener).toHaveBeenCalledWith({
-        type: "component:removed",
+        type: EVENTS.COMPONENT_REMOVED,
         entityId: entity.id,
         componentType: ComponentType.TRANSFORM,
       });
@@ -381,8 +382,8 @@ describe("GameWorld", () => {
       let planetFound = false;
 
       world.entities.forEach((entity) => {
-        if (entity.tags.has("skybox")) skyboxFound = true;
-        if (entity.tags.has("planet")) planetFound = true;
+        if (entity.tags.has(ENTITY_TAGS.SKYBOX)) skyboxFound = true;
+        if (entity.tags.has(ENTITY_TAGS.PLANET)) planetFound = true;
       });
 
       expect(skyboxFound).toBe(true);
@@ -391,11 +392,13 @@ describe("GameWorld", () => {
 
     test("should emit world:initialized event", () => {
       const listener = jest.fn();
-      world.on("world:initialized", listener);
+      world.on(EVENTS.WORLD_INITIALIZED, listener);
 
       world.initializeWorld();
 
-      expect(listener).toHaveBeenCalledWith({ type: "world:initialized" });
+      expect(listener).toHaveBeenCalledWith({
+        type: EVENTS.WORLD_INITIALIZED,
+      });
     });
   });
 
@@ -405,7 +408,7 @@ describe("GameWorld", () => {
       const playerEntity = world.createPlayerEntity(position);
 
       expect(playerEntity).toBeDefined();
-      expect(playerEntity.tags.has("player")).toBe(true);
+      expect(playerEntity.tags.has(ENTITY_TAGS.PLAYER)).toBe(true);
       expect(world.entities.has(playerEntity.id)).toBe(true);
     });
 
@@ -415,7 +418,7 @@ describe("GameWorld", () => {
       const npcEntity = world.createNPCEntity(position, dialogueKey);
 
       expect(npcEntity).toBeDefined();
-      expect(npcEntity.tags.has("npc")).toBe(true);
+      expect(npcEntity.tags.has(ENTITY_TAGS.NPC)).toBe(true);
       expect(world.entities.has(npcEntity.id)).toBe(true);
     });
 
@@ -424,7 +427,7 @@ describe("GameWorld", () => {
       const billboardEntity = world.createBillboardEntity(position);
 
       expect(billboardEntity).toBeDefined();
-      expect(billboardEntity.tags.has("billboard")).toBe(true);
+      expect(billboardEntity.tags.has(ENTITY_TAGS.BILLBOARD)).toBe(true);
       expect(world.entities.has(billboardEntity.id)).toBe(true);
     });
   });

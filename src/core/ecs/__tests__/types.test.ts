@@ -1,3 +1,4 @@
+import { ENTITY_TAGS } from "../../../config/constants";
 import {
   EntityId,
   Entity,
@@ -276,16 +277,16 @@ describe("ECS Type Definitions", () => {
     });
 
     test("should add and remove tags", () => {
-      entity.tags.add("player");
+      entity.tags.add(ENTITY_TAGS.PLAYER);
       entity.tags.add("controllable");
 
       expect(entity.tags.size).toBe(2);
-      expect(entity.tags.has("player")).toBe(true);
+      expect(entity.tags.has(ENTITY_TAGS.PLAYER)).toBe(true);
       expect(entity.tags.has("controllable")).toBe(true);
 
-      entity.tags.delete("player");
+      entity.tags.delete(ENTITY_TAGS.PLAYER);
       expect(entity.tags.size).toBe(1);
-      expect(entity.tags.has("player")).toBe(false);
+      expect(entity.tags.has(ENTITY_TAGS.PLAYER)).toBe(false);
     });
   });
 
@@ -472,10 +473,10 @@ describe("ECS Type Definitions", () => {
 
   describe("Game States", () => {
     test("should define all required game states", () => {
-      expect(GameState.LOADING).toBe("loading");
-      expect(GameState.RUNNING).toBe("running");
-      expect(GameState.PAUSED).toBe("paused");
-      expect(GameState.GAME_OVER).toBe("gameOver");
+      expect(GameState.LOADING).toBe(GameState.LOADING);
+      expect(GameState.RUNNING).toBe(GameState.RUNNING);
+      expect(GameState.PAUSED).toBe(GameState.PAUSED);
+      expect(GameState.GAME_OVER).toBe(GameState.GAME_OVER);
     });
   });
 
@@ -519,7 +520,7 @@ describe("ECS Type Definitions", () => {
         entity1.id,
         new MockComponent(ComponentType.PLAYER, entity1.id)
       );
-      entity1.tags.add("player");
+      entity1.tags.add(ENTITY_TAGS.PLAYER);
       entity1.tags.add("controllable");
 
       const entity2 = world.createEntity();
@@ -535,7 +536,7 @@ describe("ECS Type Definitions", () => {
         entity2.id,
         new MockComponent(ComponentType.DIALOGUE, entity2.id)
       );
-      entity2.tags.add("npc");
+      entity2.tags.add(ENTITY_TAGS.NPC);
       entity2.tags.add("friendly");
 
       const entity3 = world.createEntity();

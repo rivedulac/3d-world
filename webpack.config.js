@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const { DEV_SERVER_PORTS } = require("./webpack.constants");
 
 module.exports = {
   entry: "./src/game.ts",
@@ -49,7 +50,7 @@ module.exports = {
   devServer: {
     static: path.join(__dirname, "dist"),
     compress: true,
-    port: 9000,
+    port: DEV_SERVER_PORTS.DEFAULT,
     hot: true,
     client: {
       overlay: {

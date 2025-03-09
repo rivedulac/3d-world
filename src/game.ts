@@ -9,7 +9,7 @@ import { npcs } from "./npc";
 import { ViewResetButton } from "./viewResetButton";
 import { VirtualKeyboard } from "./virtualKeyboard";
 import { KeyboardButton } from "./keyboardButton";
-
+import { GameState } from "./core/ecs/types";
 // Initialize the game
 function init(): void {
   // Prevent double initialization
@@ -113,7 +113,7 @@ function init(): void {
 // Only start the game if we're in the browser environment
 if (typeof window !== "undefined") {
   // Ensure the DOM is fully loaded before initialization
-  if (document.readyState === "loading") {
+  if (document.readyState === GameState.LOADING) {
     document.addEventListener("DOMContentLoaded", () => {
       init();
     });

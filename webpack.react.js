@@ -1,6 +1,7 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const baseConfig = require("./webpack.config.js");
+const { DEV_SERVER_PORTS } = require("./webpack.constants");
 
 module.exports = {
   ...baseConfig,
@@ -22,7 +23,7 @@ module.exports = {
     static: {
       directory: path.join(__dirname, "dist"),
     },
-    port: 9001,
+    port: DEV_SERVER_PORTS.REACT,
     hot: true,
   },
 };
