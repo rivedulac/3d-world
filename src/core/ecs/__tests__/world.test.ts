@@ -388,6 +388,9 @@ describe("GameWorld", () => {
 
       expect(skyboxFound).toBe(true);
       expect(planetFound).toBe(true);
+
+      // Clean up spy
+      createEntitySpy.mockRestore();
     });
 
     test("should emit world:initialized event", () => {
@@ -402,33 +405,63 @@ describe("GameWorld", () => {
     });
   });
 
-  describe("specialized entity creation", () => {
-    test("should create a player entity with correct tags", () => {
+  describe("basic entity creation", () => {
+    test("should create a basic player entity with tag", () => {
+      // Spy on the createEntity method
+      const createEntitySpy = jest.spyOn(world, "createEntity");
+
       const position = { x: 10, y: 5, z: 20 };
       const playerEntity = world.createPlayerEntity(position);
 
+      // Verify createEntity was called
+      expect(createEntitySpy).toHaveBeenCalledTimes(1);
+
+      // Verify entity properties
       expect(playerEntity).toBeDefined();
       expect(playerEntity.tags.has(ENTITY_TAGS.PLAYER)).toBe(true);
       expect(world.entities.has(playerEntity.id)).toBe(true);
+
+      // Clean up spy
+      createEntitySpy.mockRestore();
     });
 
-    test("should create an NPC entity with correct tags", () => {
+    test("should create a basic NPC entity with tag", () => {
+      // Spy on the createEntity method
+      const createEntitySpy = jest.spyOn(world, "createEntity");
+
       const position = { x: 5, y: 0, z: 5 };
       const dialogueKey = "intro_dialogue";
       const npcEntity = world.createNPCEntity(position, dialogueKey);
 
+      // Verify createEntity was called
+      expect(createEntitySpy).toHaveBeenCalledTimes(1);
+
+      // Verify entity properties
       expect(npcEntity).toBeDefined();
       expect(npcEntity.tags.has(ENTITY_TAGS.NPC)).toBe(true);
       expect(world.entities.has(npcEntity.id)).toBe(true);
+
+      // Clean up spy
+      createEntitySpy.mockRestore();
     });
 
-    test("should create a billboard entity with correct tags", () => {
+    test("should create a basic billboard entity with tag", () => {
+      // Spy on the createEntity method
+      const createEntitySpy = jest.spyOn(world, "createEntity");
+
       const position = { x: 0, y: 2, z: -5 };
       const billboardEntity = world.createBillboardEntity(position);
 
+      // Verify createEntity was called
+      expect(createEntitySpy).toHaveBeenCalledTimes(1);
+
+      // Verify entity properties
       expect(billboardEntity).toBeDefined();
       expect(billboardEntity.tags.has(ENTITY_TAGS.BILLBOARD)).toBe(true);
       expect(world.entities.has(billboardEntity.id)).toBe(true);
+
+      // Clean up spy
+      createEntitySpy.mockRestore();
     });
   });
 

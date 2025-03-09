@@ -17,6 +17,7 @@ import { DEFAULT_POSITIONS, ENTITY_TAGS, EVENTS } from "../../config/constants";
 /**
  * Implementation of the World interface.
  * Manages all entities, components, and systems in the game.
+ * Focuses on core ECS functionality - entity/component lifecycle and system execution.
  */
 export class GameWorld implements World, EventEmitter {
   public entities: Map<EntityId, Entity>;
@@ -38,6 +39,7 @@ export class GameWorld implements World, EventEmitter {
 
   /**
    * Creates a new entity with a unique ID
+   * Core functionality - provides basic entity creation
    */
   public createEntity(): Entity {
     const entityId = uuidv4();
@@ -352,65 +354,56 @@ export class GameWorld implements World, EventEmitter {
 
   /**
    * Creates the skybox using starfield image
+   * Basic entity creation method - minimal setup
    */
-  private createSkybox(): void {
+  private createSkybox(): Entity {
     // Create skybox entity
     const skyboxEntity = this.createEntity();
 
     // Add skybox tag
     skyboxEntity.tags.add(ENTITY_TAGS.SKYBOX);
+    // TODO: Add components to the entity
 
-    // TODO: add the necessary components for a skybox
-    // a transform component and a mesh/material component
-    // Example (pseudo-code):
-    // this.addComponent(skyboxEntity.id, new TransformComponent());
-    // this.addComponent(skyboxEntity.id, new MeshComponent(ASSETS.SKYBOX));
+    console.log("Basic skybox created with entity ID:", skyboxEntity.id);
 
-    console.log("Skybox created with entity ID:", skyboxEntity.id);
+    return skyboxEntity;
   }
 
   /**
    * Creates the planet floor using silver floor image
+   * Basic entity creation method - minimal setup
    */
-  private createPlanet(): void {
+  private createPlanet(): Entity {
     // Create planet entity
     const planetEntity = this.createEntity();
 
     // Add planet tag
     planetEntity.tags.add(ENTITY_TAGS.PLANET);
+    // TODO: Add components to the entity
 
-    // TODO: add the necessary components for the planet
-    // Example (pseudo-code):
-    // this.addComponent(planetEntity.id, new TransformComponent());
-    // this.addComponent(planetEntity.id, new MeshComponent(ASSETS.PLANET));
-    // this.addComponent(planetEntity.id, new ColliderComponent('floor'));
+    console.log("Basic planet created with entity ID:", planetEntity.id);
 
-    console.log("Planet created with entity ID:", planetEntity.id);
+    return planetEntity;
   }
 
   /**
-   * Creates a default player entity
+   * Creates a simple player entity with a tag
+   * Minimal implementation - more complex player creation should be in EntityManager
    */
   public createPlayerEntity(position = DEFAULT_POSITIONS.PLAYER): Entity {
     const playerEntity = this.createEntity();
 
-    // Add player tag
     playerEntity.tags.add(ENTITY_TAGS.PLAYER);
+    // TODO: Add components to the entity
 
-    // Here you would add player components
-    // Example (pseudo-code):
-    // this.addComponent(playerEntity.id, new TransformComponent(position));
-    // this.addComponent(playerEntity.id, new PlayerComponent());
-    // this.addComponent(playerEntity.id, new ColliderComponent('player'));
-    // this.addComponent(playerEntity.id, new VelocityComponent());
-
-    console.log("Player created with entity ID:", playerEntity.id);
+    console.log("Basic player entity created");
 
     return playerEntity;
   }
 
   /**
-   * Creates an NPC entity
+   * Creates a simple NPC entity with a tag
+   * Minimal implementation - more complex NPC creation should be in EntityManager
    */
   public createNPCEntity(
     position = DEFAULT_POSITIONS.NPC,
@@ -418,36 +411,25 @@ export class GameWorld implements World, EventEmitter {
   ): Entity {
     const npcEntity = this.createEntity();
 
-    // Add NPC tag
     npcEntity.tags.add(ENTITY_TAGS.NPC);
+    // TODO: Add components to the entity
 
-    // Here you would add NPC components
-    // Example (pseudo-code):
-    // this.addComponent(npcEntity.id, new TransformComponent(position));
-    // this.addComponent(npcEntity.id, new NPCComponent(dialogueKey));
-    // this.addComponent(npcEntity.id, new ColliderComponent('npc'));
-
-    console.log("NPC created with entity ID:", npcEntity.id);
+    console.log("Basic NPC entity created");
 
     return npcEntity;
   }
 
   /**
-   * Creates a billboard entity for displaying portfolio information
+   * Creates a simple billboard entity with a tag
+   * Minimal implementation - more complex billboard creation should be in EntityManager
    */
   public createBillboardEntity(position = DEFAULT_POSITIONS.BILLBOARD): Entity {
     const billboardEntity = this.createEntity();
 
-    // Add billboard tag
     billboardEntity.tags.add(ENTITY_TAGS.BILLBOARD);
+    // TODO: Add components to the entity
 
-    // Here you would add billboard components
-    // Example (pseudo-code):
-    // this.addComponent(billboardEntity.id, new TransformComponent(position));
-    // this.addComponent(billboardEntity.id, new BillboardComponent());
-    // this.addComponent(billboardEntity.id, new InteractableComponent());
-
-    console.log("Billboard created with entity ID:", billboardEntity.id);
+    console.log("Basic billboard entity created");
 
     return billboardEntity;
   }
@@ -474,4 +456,6 @@ export class GameWorld implements World, EventEmitter {
 }
 
 // Create a singleton instance for global access
+// This can be imported directly for simple use cases
+// For more complex setups, create a new instance and use dependency injection
 export const world = new GameWorld();
