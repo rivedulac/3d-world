@@ -131,7 +131,7 @@ Logic that operates on entities with specific components.
 /src
   /core
     /ecs
-      types.ts              // Core ECS type definitions
+      types.ts              // Core ECS type definitions (runtime types)
       componentFactory.ts   // Component creation utilities
       entityManager.ts      // Entity management
       systemManager.ts      // System management
@@ -264,17 +264,63 @@ Logic that operates on entities with specific components.
       responseGen.ts        // Response generation
       contextManager.ts     // Conversation context tracking
 
-  /types                    // TypeScript type definitions
-    game.d.ts
-    components.d.ts
-    systems.d.ts
-    services.d.ts
-    repositories.d.ts
+  /types                    // TypeScript declaration files
+    game.d.ts               // Game-wide type declarations
+    components.d.ts         // Component-specific type declarations
+    systems.d.ts            // System-specific type declarations
+    services.d.ts           // Service-specific type declarations
+    repositories.d.ts       // Repository-specific type declarations
 
   /hooks                    // Custom React hooks
     useGameInput.ts         // Input handling
     useGameState.ts         // Game state access
     useAssets.ts            // Asset loading
+```
+
+## Type System Organization
+
+Our project uses a dual-layered type system to provide both runtime type safety and development-time type checking:
+
+### Core ECS Types (`src/core/ecs/types.ts`)
+
+- Contains **runtime types** used directly in the ECS implementation
+- Defines foundational interfaces for entities, components, systems, and the world
+- These types are explicitly imported and used in implementation code
+- Includes concrete TypeScript interfaces, enums, and type aliases
+- Compiles to JavaScript as part of the application
+- Focused specifically on the ECS architecture
+
+Example:
+
+```typescript
+// From src/core/ecs/types.ts
+export interface Component {
+  type: ComponentType;
+  entityId: EntityId;
+  active: boolean;
+}
+```
+
+### Declaration Files (`src/types/*.d.ts`)
+
+- Contains **ambient type declarations** for broader application use
+- Provides module-specific and application-wide type definitions
+- Available throughout the codebase without explicit imports
+- Organized by domain (game, components, systems, etc.)
+- Does not generate JavaScript code (type information only)
+- May include type definitions for external libraries and global augmentations
+
+Example:
+
+```typescript
+// From src/types/components.d.ts
+declare namespace Components {
+  interface TransformData {
+    position: Vector3;
+    rotation: Quaternion;
+    scale: Vector3;
+  }
+}
 ```
 
 ## Technical Implementation
