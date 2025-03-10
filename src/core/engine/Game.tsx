@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { GameLoop } from "./GameLoop";
 import { GAME_CANVAS_ID } from "../../config/constants";
+import { Time } from "./Time";
 
 declare const module: {
   hot?: {
@@ -11,7 +12,8 @@ declare const module: {
 
 const Game: React.FC = () => {
   useEffect(() => {
-    const gameLoop = new GameLoop();
+    const time = new Time();
+    const gameLoop = new GameLoop(time);
     gameLoop.start();
 
     return () => {

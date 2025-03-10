@@ -1,4 +1,4 @@
-import { time } from "./Time";
+import { Time } from "./Time";
 import { world } from "../ecs/world";
 import { SystemManager } from "../ecs/systemManager";
 import { EventEmitter } from "../ecs/types";
@@ -12,6 +12,8 @@ import { EVENTS, ENTITY_TAGS } from "../../config/constants";
 export class GameLoop {
   /** Whether the game loop is currently running */
   private isRunning: boolean = false;
+
+  private time: Time;
 
   /** Animation frame request ID for cancellation */
   private animationFrameId: number | null = null;
@@ -38,7 +40,8 @@ export class GameLoop {
    * Creates a new GameLoop instance
    * @param eventEmitter Optional event emitter for receiving events
    */
-  constructor(eventEmitter?: EventEmitter) {
+  constructor(time: Time, eventEmitter?: EventEmitter) {
+    this.time = time;
     this.eventEmitter = eventEmitter || world; // Use world as default event emitter
     this.systemManager = new SystemManager(world);
     this.initializeGame();
@@ -116,7 +119,7 @@ export class GameLoop {
     this.isRunning = true;
 
     // Reset time system
-    time.reset();
+    this.time.reset();
 
     // Start the loop
     this.tick();
@@ -144,7 +147,7 @@ export class GameLoop {
    * @param isPaused Whether to pause the game
    */
   public pause(isPaused: boolean): void {
-    time.isPaused = isPaused;
+    this.time.isPaused = isPaused;
     console.log(isPaused ? "Game paused" : "Game resumed");
   }
 
@@ -162,14 +165,14 @@ export class GameLoop {
    */
   private tick = (): void => {
     // Update time
-    time.update();
+    this.time.update();
 
     // Process input (always process input even when paused)
-    this.systemManager.updateSystemGroup(this.INPUT_GROUP, time.deltaTime);
+    this.systemManager.updateSystemGroup(this.INPUT_GROUP, this.time.deltaTime);
 
-    if (!time.isPaused) {
+    if (!this.time.isPaused) {
       // Regular update for non-physics systems
-      this.update(time.deltaTime);
+      this.update(this.time.deltaTime);
 
       // Fixed timestep updates for physics
       this.updateFixedTimestep();
@@ -179,9 +182,9 @@ export class GameLoop {
     this.render();
 
     // Log FPS in debug mode occasionally
-    if (this.debugMode && Math.floor(time.elapsedTime) % 5 === 0) {
+    if (this.debugMode && Math.floor(this.time.elapsedTime) % 5 === 0) {
       // Every 5 seconds
-      console.log(`FPS: ${time.fps.toFixed(1)}`);
+      console.log(`FPS: ${this.time.fps.toFixed(1)}`);
     }
 
     // Schedule next frame
@@ -202,10 +205,10 @@ export class GameLoop {
    */
   private updateFixedTimestep(): void {
     // Process physics at a fixed timestep
-    while (time.shouldRunFixedUpdate()) {
+    while (this.time.shouldRunFixedUpdate()) {
       this.systemManager.updateSystemGroup(
         this.PHYSICS_GROUP,
-        time.fixedDeltaTime
+        this.time.fixedDeltaTime
       );
     }
   }
@@ -215,7 +218,10 @@ export class GameLoop {
    */
   private render(): void {
     // Update render systems
-    this.systemManager.updateSystemGroup(this.RENDER_GROUP, time.deltaTime);
+    this.systemManager.updateSystemGroup(
+      this.RENDER_GROUP,
+      this.time.deltaTime
+    );
   }
 
   /**

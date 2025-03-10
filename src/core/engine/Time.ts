@@ -280,6 +280,3 @@ export class Time {
     return `${hours}:${minutes}:${seconds}.${milliseconds}`;
   }
 }
-
-// Create a singleton instance for global access
-export const time = new Time();

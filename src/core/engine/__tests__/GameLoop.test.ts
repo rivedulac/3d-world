@@ -1,23 +1,25 @@
 import { GameLoop } from "../GameLoop";
-import { time } from "../Time";
+import { Time } from "../Time";
 import { world } from "../../ecs/world";
 import { ComponentFactory } from "../../ecs/componentFactory";
 import { EVENTS, ENTITY_TAGS } from "../../../config/constants";
 import { EventListener, GameEvent } from "../../ecs/types";
 
 // Mock dependencies
-jest.mock("../Time", () => ({
-  time: {
-    reset: jest.fn(),
-    update: jest.fn(),
-    isPaused: false,
-    deltaTime: 0.016,
-    elapsedTime: 0,
-    fps: 60,
-    shouldRunFixedUpdate: jest.fn().mockReturnValue(false),
-    fixedDeltaTime: 0.016,
-  },
-}));
+jest.mock("../Time", () => {
+  return {
+    Time: jest.fn().mockImplementation(() => ({
+      reset: jest.fn(),
+      update: jest.fn(),
+      isPaused: false,
+      deltaTime: 0.016,
+      elapsedTime: 0,
+      fps: 60,
+      shouldRunFixedUpdate: jest.fn().mockReturnValue(false),
+      fixedDeltaTime: 0.016,
+    })),
+  };
+});
 
 jest.mock("../../ecs/world", () => ({
   world: {
@@ -53,6 +55,7 @@ jest.mock("../../ecs/componentFactory", () => ({
 
 describe("GameLoop", () => {
   let gameLoop: GameLoop;
+  let time: Time;
   const originalRAF = global.requestAnimationFrame;
   const originalCAF = global.cancelAnimationFrame;
 
@@ -65,7 +68,8 @@ describe("GameLoop", () => {
     global.cancelAnimationFrame = jest.fn();
 
     // Create a new GameLoop instance
-    gameLoop = new GameLoop();
+    time = new Time();
+    gameLoop = new GameLoop(time);
   });
 
   afterAll(() => {
