@@ -61,3 +61,36 @@ export const ENTITY_TAGS = {
   NPC: "npc",
   BILLBOARD: "billboard",
 };
+
+// ----- Time Constants -----
+export const TIME_CONSTANTS = {
+  /** Default fixed update rate (60 FPS) */
+  DEFAULT_FIXED_DELTA: 1 / 60,
+
+  /** Default time scale */
+  DEFAULT_TIME_SCALE: 1.0,
+
+  /** Default maximum delta time (100ms) */
+  DEFAULT_MAX_DELTA: 0.1,
+
+  /** Default FPS update interval (1 second) */
+  DEFAULT_FPS_INTERVAL: 1.0,
+
+  /** Minimum allowed delta time (1ms) */
+  MIN_DELTA_TIME: 0.001,
+
+  /** Minimum FPS update interval (100ms) */
+  MIN_FPS_INTERVAL: 0.1,
+
+  /** Milliseconds to seconds conversion */
+  MS_TO_SECONDS: 1000,
+
+  /** Typical frame time at 60fps (16ms) */
+  FRAME_TIME_60FPS: 0.016,
+
+  /** Time string padding */
+  TIME_PAD_LENGTH: 2,
+
+  /** Milliseconds string padding */
+  MS_PAD_LENGTH: 3,
+};
