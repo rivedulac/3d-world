@@ -3,7 +3,7 @@
  */
 import { Scene } from "../Scene";
 import * as THREE from "three";
-import { world } from "../../ecs/world";
+import { GameWorld } from "../../ecs/world";
 import { Entity } from "../../ecs/types";
 import { ENTITY_TAGS, ASSETS } from "../../../config/constants";
 
@@ -108,9 +108,8 @@ jest.mock("../../ecs/world", () => {
     delete: jest.fn(),
     size: 0,
   };
-
   return {
-    world: {
+    GameWorld: jest.fn().mockImplementation(() => ({
       createEntity: jest.fn().mockImplementation(() => ({
         id: `entity-${Math.floor(Math.random() * 1000)}`,
         tags: mockTagSet,
@@ -121,13 +120,14 @@ jest.mock("../../ecs/world", () => {
       on: jest.fn(),
       off: jest.fn(),
       emit: jest.fn(),
-    },
+    })),
   };
 });
 
 describe("Scene Class", () => {
   let testScene: Scene;
   let testContainer: HTMLElement;
+  let world: GameWorld;
 
   beforeEach(() => {
     // Reset all mocks
@@ -135,7 +135,8 @@ describe("Scene Class", () => {
     testContainer = document.createElement("div");
 
     // Create a new Scene instance with default configuration
-    testScene = new Scene();
+    world = new GameWorld();
+    testScene = new Scene(world);
   });
 
   describe("Initialization", () => {
@@ -154,7 +155,7 @@ describe("Scene Class", () => {
         ambientLightIntensity: 0.5,
       };
 
-      const customScene = new Scene(customConfig);
+      const customScene = new Scene(world, customConfig);
       expect(customScene).toBeDefined();
 
       // Access private config for testing
@@ -168,7 +169,7 @@ describe("Scene Class", () => {
     });
 
     test("should set background color when no skybox is configured", () => {
-      const customScene = new Scene({
+      const customScene = new Scene(world, {
         createSkybox: false,
         backgroundColor: "#123456",
       });
@@ -229,7 +230,7 @@ describe("Scene Class", () => {
 
   describe("Basic Scene Elements", () => {
     test("should create skybox with starfield texture when configured", () => {
-      const customScene = new Scene({ createSkybox: true });
+      const customScene = new Scene(world, { createSkybox: true });
       customScene.initialize(testContainer);
 
       expect(world.createEntity).toHaveBeenCalled();
@@ -243,7 +244,7 @@ describe("Scene Class", () => {
     });
 
     test("should create planet floor when configured", () => {
-      const customScene = new Scene({ createPlanet: true });
+      const customScene = new Scene(world, { createPlanet: true });
       customScene.initialize(testContainer);
 
       expect(world.createEntity).toHaveBeenCalled();
@@ -256,7 +257,7 @@ describe("Scene Class", () => {
       // Clear previous calls to createEntity
       (world.createEntity as jest.Mock).mockClear();
 
-      const customScene = new Scene({
+      const customScene = new Scene(world, {
         createSkybox: false,
         createPlanet: false,
       });
@@ -286,7 +287,7 @@ describe("Scene Class", () => {
       }));
 
       try {
-        const customScene = new Scene({
+        const customScene = new Scene(world, {
           createSkybox: true,
           createPlanet: true,
         });
@@ -309,7 +310,7 @@ describe("Scene Class", () => {
 
   describe("Debug Helpers", () => {
     test("should add debug helpers when configured", () => {
-      const customScene = new Scene({ showDebugHelpers: true });
+      const customScene = new Scene(world, { showDebugHelpers: true });
       customScene.initialize(testContainer);
 
       expect(THREE.AxesHelper).toHaveBeenCalled();
@@ -319,7 +320,7 @@ describe("Scene Class", () => {
     });
 
     test("should toggle debug helpers visibility", () => {
-      const customScene = new Scene({ showDebugHelpers: true });
+      const customScene = new Scene(world, { showDebugHelpers: true });
       customScene.initialize(testContainer);
 
       // Add some debug helpers

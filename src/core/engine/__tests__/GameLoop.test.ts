@@ -1,6 +1,6 @@
 import { GameLoop } from "../GameLoop";
 import { Time } from "../Time";
-import { world } from "../../ecs/world";
+import { GameWorld } from "../../ecs/world";
 import { ComponentFactory } from "../../ecs/componentFactory";
 import { EVENTS, ENTITY_TAGS } from "../../../config/constants";
 import { EventListener, GameEvent } from "../../ecs/types";
@@ -21,21 +21,23 @@ jest.mock("../Time", () => {
   };
 });
 
-jest.mock("../../ecs/world", () => ({
-  world: {
-    initializeWorld: jest.fn(),
-    update: jest.fn(),
-    destroy: jest.fn(),
-    createPlayerEntity: jest.fn(),
-    queryEntities: jest.fn().mockReturnValue([]),
-    on: jest.fn(),
-    off: jest.fn(),
-    emit: jest.fn(),
-    createNPCEntity: jest.fn(),
-    createSkybox: jest.fn(),
-    createEntity: jest.fn(),
-  },
-}));
+jest.mock("../../ecs/world", () => {
+  return {
+    GameWorld: jest.fn().mockImplementation(() => ({
+      initializeWorld: jest.fn(),
+      update: jest.fn(),
+      destroy: jest.fn(),
+      createPlayerEntity: jest.fn(),
+      queryEntities: jest.fn().mockReturnValue([]),
+      on: jest.fn(),
+      off: jest.fn(),
+      emit: jest.fn(),
+      createNPCEntity: jest.fn(),
+      createSkybox: jest.fn(),
+      createEntity: jest.fn(),
+    })),
+  };
+});
 
 jest.mock("../../ecs/systemManager", () => {
   return {
@@ -56,6 +58,7 @@ jest.mock("../../ecs/componentFactory", () => ({
 describe("GameLoop", () => {
   let gameLoop: GameLoop;
   let time: Time;
+  let world: GameWorld;
   const originalRAF = global.requestAnimationFrame;
   const originalCAF = global.cancelAnimationFrame;
 
@@ -69,7 +72,8 @@ describe("GameLoop", () => {
 
     // Create a new GameLoop instance
     time = new Time();
-    gameLoop = new GameLoop(time);
+    world = new GameWorld();
+    gameLoop = new GameLoop(world, time);
   });
 
   afterAll(() => {

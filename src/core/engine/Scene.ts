@@ -4,7 +4,7 @@
  * Handles the connection between ECS entities and Three.js objects.
  */
 import * as THREE from "three";
-import { world } from "../ecs/world";
+import { GameWorld } from "../ecs/world";
 import { Entity, EntityId } from "../ecs/types";
 import { ASSETS, ENTITY_TAGS } from "../../config/constants";
 import { Vector3 } from "../../utils/math";
@@ -58,6 +58,8 @@ export class Scene {
   /** Current scene configuration */
   private config: SceneConfig;
 
+  private world: GameWorld;
+
   /** Three.js renderer */
   private renderer: THREE.WebGLRenderer | null = null;
 
@@ -92,7 +94,8 @@ export class Scene {
    * Creates a new Scene instance
    * @param config Scene configuration options
    */
-  constructor(config: Partial<SceneConfig> = {}) {
+  constructor(world: GameWorld, config: Partial<SceneConfig> = {}) {
+    this.world = world;
     this.config = { ...DEFAULT_SCENE_CONFIG, ...config };
     this.scene = new THREE.Scene();
 
@@ -256,7 +259,7 @@ export class Scene {
    * Creates the skybox
    */
   private createSkybox(): void {
-    const skyboxEntity = world.createEntity();
+    const skyboxEntity = this.world.createEntity();
     skyboxEntity.tags.add(ENTITY_TAGS.SKYBOX);
     this.skyboxEntityId = skyboxEntity.id;
 
@@ -293,7 +296,7 @@ export class Scene {
    * Creates the planet floor
    */
   private createPlanet(): void {
-    const planetEntity = world.createEntity();
+    const planetEntity = this.world.createEntity();
     planetEntity.tags.add(ENTITY_TAGS.PLANET);
     this.planetEntityId = planetEntity.id;
 

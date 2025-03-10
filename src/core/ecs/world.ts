@@ -454,8 +454,3 @@ export class GameWorld implements World, EventEmitter {
     console.log("World destroyed");
   }
 }
-
-// Create a singleton instance for global access
-// This can be imported directly for simple use cases
-// For more complex setups, create a new instance and use dependency injection
-export const world = new GameWorld();

@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { GameLoop } from "./GameLoop";
 import { GAME_CANVAS_ID } from "../../config/constants";
 import { Time } from "./Time";
-
+import { GameWorld } from "../ecs/world";
 declare const module: {
   hot?: {
     accept: () => void;
@@ -13,7 +13,8 @@ declare const module: {
 const Game: React.FC = () => {
   useEffect(() => {
     const time = new Time();
-    const gameLoop = new GameLoop(time);
+    const world = new GameWorld();
+    const gameLoop = new GameLoop(world, time);
     gameLoop.start();
 
     return () => {

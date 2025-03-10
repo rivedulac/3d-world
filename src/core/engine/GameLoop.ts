@@ -1,5 +1,5 @@
 import { Time } from "./Time";
-import { world } from "../ecs/world";
+import { GameWorld } from "../ecs/world";
 import { SystemManager } from "../ecs/systemManager";
 import { EventEmitter } from "../ecs/types";
 import { ComponentFactory } from "../ecs/componentFactory";
@@ -12,6 +12,8 @@ import { EVENTS, ENTITY_TAGS } from "../../config/constants";
 export class GameLoop {
   /** Whether the game loop is currently running */
   private isRunning: boolean = false;
+
+  private world: GameWorld;
 
   private time: Time;
 
@@ -40,7 +42,8 @@ export class GameLoop {
    * Creates a new GameLoop instance
    * @param eventEmitter Optional event emitter for receiving events
    */
-  constructor(time: Time, eventEmitter?: EventEmitter) {
+  constructor(world: GameWorld, time: Time, eventEmitter?: EventEmitter) {
+    this.world = world;
     this.time = time;
     this.eventEmitter = eventEmitter || world; // Use world as default event emitter
     this.systemManager = new SystemManager(world);
@@ -55,7 +58,7 @@ export class GameLoop {
     this.registerEventListeners();
 
     // Initialize the world
-    world.initializeWorld();
+    this.world.initializeWorld();
 
     // Register system groups
     this.initializeSystems();
@@ -102,8 +105,8 @@ export class GameLoop {
    */
   private createInitialEntities(): void {
     // Create player entity if it doesn't exist
-    if (world.queryEntities({ tags: [ENTITY_TAGS.PLAYER] }).length === 0) {
-      world.createPlayerEntity();
+    if (this.world.queryEntities({ tags: [ENTITY_TAGS.PLAYER] }).length === 0) {
+      this.world.createPlayerEntity();
     }
 
     console.log("Initial entities created");
@@ -197,7 +200,7 @@ export class GameLoop {
    */
   private update(deltaTime: number): void {
     // Update the world (this runs all systems not in specific groups)
-    world.update(deltaTime);
+    this.world.update(deltaTime);
   }
 
   /**
@@ -234,7 +237,7 @@ export class GameLoop {
     this.systemManager.destroy();
 
     // Clean up world
-    world.destroy();
+    this.world.destroy();
 
     // Clean up component pools
     ComponentFactory.clearPools();
