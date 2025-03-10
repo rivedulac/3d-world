@@ -49,16 +49,19 @@ jest.mock("../../ecs/systemManager", () => {
   };
 });
 
-jest.mock("../../ecs/componentFactory", () => ({
-  ComponentFactory: {
-    clearPools: jest.fn(),
-  },
-}));
+jest.mock("../../ecs/componentFactory", () => {
+  return {
+    ComponentFactory: jest.fn().mockImplementation(() => ({
+      clearPools: jest.fn(),
+    })),
+  };
+});
 
 describe("GameLoop", () => {
   let gameLoop: GameLoop;
   let time: Time;
   let world: GameWorld;
+  let componentFactory: ComponentFactory;
   const originalRAF = global.requestAnimationFrame;
   const originalCAF = global.cancelAnimationFrame;
 
@@ -73,7 +76,8 @@ describe("GameLoop", () => {
     // Create a new GameLoop instance
     time = new Time();
     world = new GameWorld();
-    gameLoop = new GameLoop(world, time);
+    componentFactory = new ComponentFactory();
+    gameLoop = new GameLoop(world, time, componentFactory);
   });
 
   afterAll(() => {
@@ -265,7 +269,7 @@ describe("GameLoop", () => {
       expect(world.destroy).toHaveBeenCalled();
 
       // Should clean up component pools
-      expect(ComponentFactory.clearPools).toHaveBeenCalled();
+      expect(componentFactory.clearPools).toHaveBeenCalled();
     });
   });
 

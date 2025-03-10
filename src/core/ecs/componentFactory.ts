@@ -18,23 +18,31 @@ import { Component, ComponentType, ComponentConstructor } from "./types";
  */
 export class ComponentFactory {
   // Registry of component constructors mapped by component type
-  private static componentRegistry: Map<
+  private componentRegistry: Map<
     ComponentType,
     ComponentConstructor<Component>
   > = new Map();
 
   // Object pools for each component type
-  private static componentPools: Map<ComponentType, Component[]> = new Map();
+  private componentPools: Map<ComponentType, Component[]> = new Map();
 
   // Maximum pool size per component type (to avoid memory leaks)
-  private static readonly MAX_POOL_SIZE = 1000;
+  private readonly MAX_POOL_SIZE = 1000;
+
+  constructor() {
+    this.componentRegistry = new Map<
+      ComponentType,
+      ComponentConstructor<Component>
+    >();
+    this.componentPools = new Map<ComponentType, Component[]>();
+  }
 
   /**
    * Registers a component constructor for a specific component type
    * @param type The component type
    * @param constructor The component constructor
    */
-  public static register<T extends Component>(
+  public register<T extends Component>(
     type: ComponentType,
     constructor: ComponentConstructor<T>
   ): void {
@@ -55,7 +63,7 @@ export class ComponentFactory {
    * Unregisters a component type
    * @param type The component type to unregister
    */
-  public static unregister(type: ComponentType): void {
+  public unregister(type: ComponentType): void {
     this.componentRegistry.delete(type);
     this.componentPools.delete(type);
   }
@@ -65,7 +73,7 @@ export class ComponentFactory {
    * @param type The component type to check
    * @returns True if the component type is registered
    */
-  public static isRegistered(type: ComponentType): boolean {
+  public isRegistered(type: ComponentType): boolean {
     return this.componentRegistry.has(type);
   }
 
@@ -77,10 +85,7 @@ export class ComponentFactory {
    * @returns The created or recycled component
    * @throws Error if the component type is not registered
    */
-  public static create<T extends Component>(
-    type: ComponentType,
-    ...args: any[]
-  ): T {
+  public create<T extends Component>(type: ComponentType, ...args: any[]): T {
     if (!this.isRegistered(type)) {
       throw new Error(`Component type ${type} is not registered.`);
     }
@@ -112,7 +117,7 @@ export class ComponentFactory {
    * Recycles a component back into its pool for future reuse
    * @param component The component to recycle
    */
-  public static recycle(component: Component): void {
+  public recycle(component: Component): void {
     const type = component.type;
 
     if (!this.isRegistered(type)) {
@@ -138,7 +143,7 @@ export class ComponentFactory {
    * @param component The component to reset
    * @param args New arguments to initialize the component with
    */
-  private static resetComponent(component: Component, ...args: any[]): void {
+  private resetComponent(component: Component, ...args: any[]): void {
     // By default, we'll just set the active state to true
     component.active = true;
 
@@ -163,7 +168,7 @@ export class ComponentFactory {
    * Clear all component pools
    * Call this when destroying the world
    */
-  public static clearPools(): void {
+  public clearPools(): void {
     this.componentPools.forEach((pool) => {
       pool.length = 0;
     });
@@ -174,7 +179,7 @@ export class ComponentFactory {
    * @param type The component type
    * @returns The number of components in the pool, or 0 if the type is not registered
    */
-  public static getPoolSize(type: ComponentType): number {
+  public getPoolSize(type: ComponentType): number {
     if (!this.isRegistered(type)) {
       return 0;
     }
@@ -186,7 +191,7 @@ export class ComponentFactory {
    * @param type The component type
    * @returns The component constructor, or undefined if not registered
    */
-  public static getConstructor<T extends Component>(
+  public getConstructor<T extends Component>(
     type: ComponentType
   ): ComponentConstructor<T> | undefined {
     return this.componentRegistry.get(type) as

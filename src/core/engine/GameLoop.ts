@@ -17,6 +17,8 @@ export class GameLoop {
 
   private time: Time;
 
+  private componentFactory: ComponentFactory;
+
   /** Animation frame request ID for cancellation */
   private animationFrameId: number | null = null;
 
@@ -42,9 +44,15 @@ export class GameLoop {
    * Creates a new GameLoop instance
    * @param eventEmitter Optional event emitter for receiving events
    */
-  constructor(world: GameWorld, time: Time, eventEmitter?: EventEmitter) {
+  constructor(
+    world: GameWorld,
+    time: Time,
+    componentFactory: ComponentFactory,
+    eventEmitter?: EventEmitter
+  ) {
     this.world = world;
     this.time = time;
+    this.componentFactory = componentFactory;
     this.eventEmitter = eventEmitter || world; // Use world as default event emitter
     this.systemManager = new SystemManager(world);
     this.initializeGame();
@@ -240,7 +248,7 @@ export class GameLoop {
     this.world.destroy();
 
     // Clean up component pools
-    ComponentFactory.clearPools();
+    this.componentFactory.clearPools();
 
     console.log("Game destroyed");
   }

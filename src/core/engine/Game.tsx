@@ -4,6 +4,8 @@ import { GameLoop } from "./GameLoop";
 import { GAME_CANVAS_ID } from "../../config/constants";
 import { Time } from "./Time";
 import { GameWorld } from "../ecs/world";
+import { ComponentFactory } from "../ecs/componentFactory";
+
 declare const module: {
   hot?: {
     accept: () => void;
@@ -14,7 +16,8 @@ const Game: React.FC = () => {
   useEffect(() => {
     const time = new Time();
     const world = new GameWorld();
-    const gameLoop = new GameLoop(world, time);
+    const componentFactory = new ComponentFactory();
+    const gameLoop = new GameLoop(world, time, componentFactory);
     gameLoop.start();
 
     return () => {

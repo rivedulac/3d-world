@@ -47,37 +47,25 @@ class BasicComponent implements Component {
 }
 
 describe("ComponentFactory", () => {
-  // Clear the registry before each test to ensure isolation
-  beforeEach(() => {
-    // Clear the registry by using unregister on any registered components
-    [
-      ComponentType.TRANSFORM,
-      ComponentType.VELOCITY,
-      ComponentType.PLAYER,
-      ComponentType.NPC,
-    ].forEach((type) => {
-      if (ComponentFactory.isRegistered(type)) {
-        ComponentFactory.unregister(type);
-      }
-    });
-  });
+  let componentFactory: ComponentFactory;
 
-  afterAll(() => {
-    ComponentFactory.clearPools();
+  // Create a fresh ComponentFactory for each test
+  beforeEach(() => {
+    componentFactory = new ComponentFactory();
   });
 
   describe("registration", () => {
     test("should register a component constructor", () => {
-      ComponentFactory.register(ComponentType.TRANSFORM, MockComponent);
+      componentFactory.register(ComponentType.TRANSFORM, MockComponent);
 
-      expect(ComponentFactory.isRegistered(ComponentType.TRANSFORM)).toBe(true);
+      expect(componentFactory.isRegistered(ComponentType.TRANSFORM)).toBe(true);
     });
 
     test("should unregister a component constructor", () => {
-      ComponentFactory.register(ComponentType.TRANSFORM, MockComponent);
-      ComponentFactory.unregister(ComponentType.TRANSFORM);
+      componentFactory.register(ComponentType.TRANSFORM, MockComponent);
+      componentFactory.unregister(ComponentType.TRANSFORM);
 
-      expect(ComponentFactory.isRegistered(ComponentType.TRANSFORM)).toBe(
+      expect(componentFactory.isRegistered(ComponentType.TRANSFORM)).toBe(
         false
       );
     });
@@ -88,8 +76,8 @@ describe("ComponentFactory", () => {
       const mockWarn = jest.fn();
       console.warn = mockWarn;
 
-      ComponentFactory.register(ComponentType.TRANSFORM, MockComponent);
-      ComponentFactory.register(ComponentType.TRANSFORM, MockComponent);
+      componentFactory.register(ComponentType.TRANSFORM, MockComponent);
+      componentFactory.register(ComponentType.TRANSFORM, MockComponent);
 
       expect(mockWarn).toHaveBeenCalledWith(
         expect.stringContaining("already registered")
@@ -100,9 +88,9 @@ describe("ComponentFactory", () => {
     });
 
     test("should get component constructor", () => {
-      ComponentFactory.register(ComponentType.TRANSFORM, MockComponent);
+      componentFactory.register(ComponentType.TRANSFORM, MockComponent);
 
-      const constructor = ComponentFactory.getConstructor(
+      const constructor = componentFactory.getConstructor(
         ComponentType.TRANSFORM
       );
 
@@ -110,7 +98,7 @@ describe("ComponentFactory", () => {
     });
 
     test("should return undefined for unregistered component constructor", () => {
-      const constructor = ComponentFactory.getConstructor(
+      const constructor = componentFactory.getConstructor(
         ComponentType.VELOCITY
       );
 
@@ -120,9 +108,9 @@ describe("ComponentFactory", () => {
 
   describe("component creation", () => {
     test("should create a component", () => {
-      ComponentFactory.register(ComponentType.TRANSFORM, MockComponent);
+      componentFactory.register(ComponentType.TRANSFORM, MockComponent);
 
-      const component = ComponentFactory.create<MockComponent>(
+      const component = componentFactory.create<MockComponent>(
         ComponentType.TRANSFORM,
         ComponentType.TRANSFORM,
         42
@@ -135,17 +123,17 @@ describe("ComponentFactory", () => {
 
     test("should throw an error when creating an unregistered component", () => {
       expect(() => {
-        ComponentFactory.create(ComponentType.VELOCITY);
+        componentFactory.create(ComponentType.VELOCITY);
       }).toThrow(/not registered/);
     });
   });
 
   describe("component recycling", () => {
     test("should recycle and reuse components", () => {
-      ComponentFactory.register(ComponentType.TRANSFORM, MockComponent);
+      componentFactory.register(ComponentType.TRANSFORM, MockComponent);
 
       // Create a component
-      const component1 = ComponentFactory.create<MockComponent>(
+      const component1 = componentFactory.create<MockComponent>(
         ComponentType.TRANSFORM,
         ComponentType.TRANSFORM,
         42
@@ -153,20 +141,20 @@ describe("ComponentFactory", () => {
       component1.entityId = "entity1";
 
       // Recycle it
-      ComponentFactory.recycle(component1);
+      componentFactory.recycle(component1);
 
       // Check pool size
-      expect(ComponentFactory.getPoolSize(ComponentType.TRANSFORM)).toBe(1);
+      expect(componentFactory.getPoolSize(ComponentType.TRANSFORM)).toBe(1);
 
       // Create another component - should reuse the recycled one
-      const component2 = ComponentFactory.create<MockComponent>(
+      const component2 = componentFactory.create<MockComponent>(
         ComponentType.TRANSFORM,
         ComponentType.TRANSFORM,
         100
       );
 
       // Pool should now be empty
-      expect(ComponentFactory.getPoolSize(ComponentType.TRANSFORM)).toBe(0);
+      expect(componentFactory.getPoolSize(ComponentType.TRANSFORM)).toBe(0);
 
       // Should be the same object (recycled)
       expect(component2).toBe(component1);
@@ -178,20 +166,20 @@ describe("ComponentFactory", () => {
     });
 
     test("should handle components without a reset method", () => {
-      ComponentFactory.register(ComponentType.VELOCITY, BasicComponent);
+      componentFactory.register(ComponentType.VELOCITY, BasicComponent);
 
       // Create a component
-      const component1 = ComponentFactory.create<BasicComponent>(
+      const component1 = componentFactory.create<BasicComponent>(
         ComponentType.VELOCITY
       );
       component1.entityId = "entity1";
       component1.active = true;
 
       // Recycle it
-      ComponentFactory.recycle(component1);
+      componentFactory.recycle(component1);
 
       // Create another component - should reuse the recycled one
-      const component2 = ComponentFactory.create<BasicComponent>(
+      const component2 = componentFactory.create<BasicComponent>(
         ComponentType.VELOCITY
       );
 
@@ -208,32 +196,32 @@ describe("ComponentFactory", () => {
       const component = new MockComponent(ComponentType.PLAYER);
 
       // This should not throw an error
-      ComponentFactory.recycle(component);
+      componentFactory.recycle(component);
 
       // Shouldn't have a pool for this type
-      expect(ComponentFactory.getPoolSize(ComponentType.PLAYER)).toBe(0);
+      expect(componentFactory.getPoolSize(ComponentType.PLAYER)).toBe(0);
     });
 
     test("should not exceed max pool size", () => {
-      ComponentFactory.register(ComponentType.TRANSFORM, MockComponent);
+      componentFactory.register(ComponentType.TRANSFORM, MockComponent);
 
       // Access the MAX_POOL_SIZE through reflection
-      const maxPoolSize = (ComponentFactory as any).MAX_POOL_SIZE;
+      const maxPoolSize = (componentFactory as any).MAX_POOL_SIZE;
       const components = [];
 
       // Create and recycle more components than MAX_POOL_SIZE
       for (let i = 0; i < maxPoolSize + 10; i++) {
-        const component = ComponentFactory.create<MockComponent>(
+        const component = componentFactory.create<MockComponent>(
           ComponentType.TRANSFORM
         );
         components.push(component);
       }
 
       // Recycle all components
-      components.forEach((component) => ComponentFactory.recycle(component));
+      components.forEach((component) => componentFactory.recycle(component));
 
       // Pool size should be capped at MAX_POOL_SIZE
-      expect(ComponentFactory.getPoolSize(ComponentType.TRANSFORM)).toBe(
+      expect(componentFactory.getPoolSize(ComponentType.TRANSFORM)).toBe(
         maxPoolSize
       );
     });
@@ -241,19 +229,8 @@ describe("ComponentFactory", () => {
 
   describe("utility functions", () => {
     test("should clear all component pools", () => {
-      // Clear any existing pools first
-      ComponentFactory.clearPools();
-
-      // Unregister and re-register component types to ensure clean state
-      if (ComponentFactory.isRegistered(ComponentType.TRANSFORM)) {
-        ComponentFactory.unregister(ComponentType.TRANSFORM);
-      }
-      if (ComponentFactory.isRegistered(ComponentType.VELOCITY)) {
-        ComponentFactory.unregister(ComponentType.VELOCITY);
-      }
-
-      ComponentFactory.register(ComponentType.TRANSFORM, MockComponent);
-      ComponentFactory.register(ComponentType.VELOCITY, BasicComponent);
+      componentFactory.register(ComponentType.TRANSFORM, MockComponent);
+      componentFactory.register(ComponentType.VELOCITY, BasicComponent);
 
       // Create and store components in arrays to ensure they're unique
       const transformComponents: MockComponent[] = [];
@@ -272,28 +249,61 @@ describe("ComponentFactory", () => {
         velocityComponents.push(velocityComponent);
 
         // Immediately recycle each component
-        ComponentFactory.recycle(transformComponent);
-        ComponentFactory.recycle(velocityComponent);
+        componentFactory.recycle(transformComponent);
+        componentFactory.recycle(velocityComponent);
       }
 
       // Verify pool sizes
-      expect(ComponentFactory.getPoolSize(ComponentType.TRANSFORM)).toBe(5);
-      expect(ComponentFactory.getPoolSize(ComponentType.VELOCITY)).toBe(5);
+      expect(componentFactory.getPoolSize(ComponentType.TRANSFORM)).toBe(5);
+      expect(componentFactory.getPoolSize(ComponentType.VELOCITY)).toBe(5);
 
       // Clear all pools
-      ComponentFactory.clearPools();
+      componentFactory.clearPools();
 
       // Verify pools are empty
-      expect(ComponentFactory.getPoolSize(ComponentType.TRANSFORM)).toBe(0);
-      expect(ComponentFactory.getPoolSize(ComponentType.VELOCITY)).toBe(0);
+      expect(componentFactory.getPoolSize(ComponentType.TRANSFORM)).toBe(0);
+      expect(componentFactory.getPoolSize(ComponentType.VELOCITY)).toBe(0);
     });
 
     test("should return 0 for pool size of unregistered components", () => {
-      expect(ComponentFactory.getPoolSize(ComponentType.NPC)).toBe(0);
+      expect(componentFactory.getPoolSize(ComponentType.NPC)).toBe(0);
+    });
+  });
+
+  describe("instance separation", () => {
+    test("should maintain separate component registries between instances", () => {
+      // Create two separate component factory instances
+      const factory1 = new ComponentFactory();
+      const factory2 = new ComponentFactory();
+
+      // Register a component only in factory1
+      factory1.register(ComponentType.TRANSFORM, MockComponent);
+
+      // Factory1 should have the component registered
+      expect(factory1.isRegistered(ComponentType.TRANSFORM)).toBe(true);
+
+      // Factory2 should not have the component registered
+      expect(factory2.isRegistered(ComponentType.TRANSFORM)).toBe(false);
     });
 
-    test("should return 0 for pool size of unregistered components", () => {
-      expect(ComponentFactory.getPoolSize(ComponentType.NPC)).toBe(0);
+    test("should maintain separate component pools between instances", () => {
+      // Create two separate component factory instances
+      const factory1 = new ComponentFactory();
+      const factory2 = new ComponentFactory();
+
+      // Register the same component type in both factories
+      factory1.register(ComponentType.TRANSFORM, MockComponent);
+      factory2.register(ComponentType.TRANSFORM, MockComponent);
+
+      // Create and recycle a component in factory1
+      const component = factory1.create<MockComponent>(ComponentType.TRANSFORM);
+      factory1.recycle(component);
+
+      // Factory1 should have one component in its pool
+      expect(factory1.getPoolSize(ComponentType.TRANSFORM)).toBe(1);
+
+      // Factory2 should have an empty pool
+      expect(factory2.getPoolSize(ComponentType.TRANSFORM)).toBe(0);
     });
   });
 });
