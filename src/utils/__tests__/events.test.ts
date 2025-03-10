@@ -1,7 +1,6 @@
 import {
   EventEmitter,
   GameEvent,
-  EventListener,
   createEvent,
   MiddlewareEventEmitter,
   EventMiddleware,

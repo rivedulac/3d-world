@@ -131,11 +131,6 @@ export class EventEmitter {
 }
 
 /**
- * Global event bus for game-wide events
- */
-export const eventBus = new EventEmitter();
-
-/**
  * Creates an event with the given type and data
  * @param type Event type
  * @param data Additional event data
